@@ -12,3 +12,4 @@ public interface BusinessRepository extends JpaRepository<BusinessEntity, UUID> 
     Optional<BusinessEntity> findBySlug(String slug);
     boolean existsBySlug(String slug);
 }
+

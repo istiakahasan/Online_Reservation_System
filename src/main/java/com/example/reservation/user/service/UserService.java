@@ -11,3 +11,4 @@ public interface UserService {
     List<UserResponseDto> getUsersByBusiness(UUID businessId);
     UserResponseDto updateUser(UUID userId, UpdateUserRequestDto request);
 }
+

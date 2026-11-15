@@ -111,3 +111,4 @@ public class ReservationEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

@@ -71,3 +71,4 @@ public class StaffEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

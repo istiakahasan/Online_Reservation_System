@@ -16,3 +16,4 @@ public record UpdateUserRequestDto(
         @Schema(description = "Phone number", example = "+1987654321")
         String phone
 ) {}
+

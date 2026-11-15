@@ -34,3 +34,4 @@ public record CreateServiceRequestDto(
         @Schema(description = "ISO-4217 Currency Code", example = "USD")
         String currency
 ) {}
+

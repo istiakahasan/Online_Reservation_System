@@ -31,3 +31,4 @@ public record BusinessResponseDto(
         @Schema(description = "Creation timestamp")
         Instant createdAt
 ) {}
+

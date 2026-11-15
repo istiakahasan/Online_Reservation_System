@@ -28,3 +28,4 @@ class AvailabilityControllerTest {
         assertThat(availabilityService).isNotNull();
     }
 }
+

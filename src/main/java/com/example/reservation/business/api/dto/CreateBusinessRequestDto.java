@@ -28,3 +28,4 @@ public record CreateBusinessRequestDto(
         @Schema(description = "Contact phone number", example = "+12125550199")
         String phone
 ) {}
+

@@ -21,3 +21,4 @@ public abstract class AppException extends RuntimeException {
         return status;
     }
 }
+

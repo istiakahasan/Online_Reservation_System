@@ -14,3 +14,4 @@ public interface AvailabilityRepository extends JpaRepository<AvailabilitySlotEn
             UUID businessId, UUID staffId, Instant from, Instant to
     );
 }
+

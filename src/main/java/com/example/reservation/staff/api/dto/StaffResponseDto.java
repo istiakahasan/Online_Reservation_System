@@ -27,3 +27,4 @@ public record StaffResponseDto(
         @Schema(description = "Active status flag")
         Boolean isActive
 ) {}
+

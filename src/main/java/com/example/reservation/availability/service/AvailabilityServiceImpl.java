@@ -23,3 +23,4 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         return Collections.emptyList();
     }
 }
+

@@ -21,8 +21,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDto error = new ErrorResponseDto(
                 ex.getStatus().value(),
                 ex.getErrorCode(),
-                ex.getMessage()
-        );
+                ex.getMessage());
         return ResponseEntity.status(ex.getStatus()).body(error);
     }
 
@@ -36,8 +35,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 "VALIDATION_FAILED",
                 "Request validation failed",
-                errors
-        );
+                errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
@@ -47,8 +45,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDto error = new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "INTERNAL_SERVER_ERROR",
-                "An unexpected internal server error occurred"
-        );
+                "An unexpected internal server error occurred");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }

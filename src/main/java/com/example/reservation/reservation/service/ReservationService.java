@@ -12,3 +12,4 @@ public interface ReservationService {
     List<ReservationResponseDto> getCustomerReservations(UUID customerId);
     ReservationResponseDto cancelReservation(UUID id, UUID actorId, String reason);
 }
+

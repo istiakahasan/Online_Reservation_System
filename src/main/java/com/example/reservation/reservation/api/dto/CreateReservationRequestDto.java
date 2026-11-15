@@ -31,3 +31,4 @@ public record CreateReservationRequestDto(
         @Schema(description = "Optional booking notes / special requests")
         String notes
 ) {}
+

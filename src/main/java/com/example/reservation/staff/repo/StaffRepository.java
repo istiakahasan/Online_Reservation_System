@@ -14,3 +14,4 @@ public interface StaffRepository extends JpaRepository<StaffEntity, UUID> {
     List<StaffEntity> findAllByBusinessIdAndIsActiveTrue(UUID businessId);
     Optional<StaffEntity> findByUserId(UUID userId);
 }
+

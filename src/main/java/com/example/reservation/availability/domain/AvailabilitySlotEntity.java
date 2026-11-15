@@ -71,3 +71,4 @@ public class AvailabilitySlotEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

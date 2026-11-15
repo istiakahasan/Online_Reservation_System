@@ -15,3 +15,4 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     List<UserEntity> findAllByBusinessId(UUID businessId);
     List<UserEntity> findAllByBusinessIdAndRole(UUID businessId, UserRole role);
 }
+

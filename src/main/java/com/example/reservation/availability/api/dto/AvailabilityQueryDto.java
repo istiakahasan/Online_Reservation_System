@@ -27,3 +27,4 @@ public record AvailabilityQueryDto(
         @NotNull(message = "toTime is required")
         Instant toTime
 ) {}
+

@@ -34,3 +34,4 @@ public record UserResponseDto(
         @Schema(description = "Profile creation timestamp")
         Instant createdAt
 ) {}
+

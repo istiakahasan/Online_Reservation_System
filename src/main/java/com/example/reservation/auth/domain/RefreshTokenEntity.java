@@ -60,3 +60,4 @@ public class RefreshTokenEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

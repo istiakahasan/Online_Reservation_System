@@ -16,3 +16,4 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     List<ReservationEntity> findAllByStaffIdAndStartTimeBetween(UUID staffId, Instant from, Instant to);
     List<ReservationEntity> findAllByStatusAndHoldExpiresAtBefore(ReservationStatus status, Instant now);
 }
+

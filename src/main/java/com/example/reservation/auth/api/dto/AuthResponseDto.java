@@ -31,3 +31,4 @@ public record AuthResponseDto(
         return new AuthResponseDto(accessToken, refreshToken, "Bearer", expiresIn, userId, businessId, role);
     }
 }
+

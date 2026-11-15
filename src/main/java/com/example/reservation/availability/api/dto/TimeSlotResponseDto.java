@@ -22,3 +22,4 @@ public record TimeSlotResponseDto(
         @Schema(description = "Slot availability status")
         boolean available
 ) {}
+

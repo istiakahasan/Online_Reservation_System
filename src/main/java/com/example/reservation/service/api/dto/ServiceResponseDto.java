@@ -31,3 +31,4 @@ public record ServiceResponseDto(
         @Schema(description = "Active status flag")
         Boolean isActive
 ) {}
+

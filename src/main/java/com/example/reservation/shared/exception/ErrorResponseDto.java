@@ -30,3 +30,4 @@ public record ErrorResponseDto(
         this(status, errorCode, message, Instant.now(), details);
     }
 }
+

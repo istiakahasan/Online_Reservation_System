@@ -30,3 +30,4 @@ public abstract class BaseAuditableEntity {
     @Column(name = "version", nullable = false)
     private Long version;
 }
+

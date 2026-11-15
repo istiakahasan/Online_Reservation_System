@@ -8,3 +8,4 @@ import java.util.List;
 public interface AvailabilityService {
     List<TimeSlotResponseDto> findAvailableSlots(AvailabilityQueryDto query);
 }
+

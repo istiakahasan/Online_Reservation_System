@@ -10,3 +10,4 @@ public interface BusinessService {
     BusinessResponseDto getBusinessById(UUID id);
     BusinessResponseDto getBusinessBySlug(String slug);
 }
+

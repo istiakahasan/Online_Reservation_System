@@ -9,3 +9,4 @@ public interface AuthService {
     AuthResponseDto register(RegisterRequestDto request);
     AuthResponseDto refreshToken(String refreshToken);
 }
+

@@ -28,3 +28,4 @@ class AuthControllerTest {
         assertThat(authService).isNotNull();
     }
 }
+

@@ -28,3 +28,4 @@ class UserControllerTest {
         assertThat(userService).isNotNull();
     }
 }
+

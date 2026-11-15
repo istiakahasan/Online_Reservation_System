@@ -23,3 +23,4 @@ public record CreateStaffRequestDto(
         @Schema(description = "Staff bio / specialization")
         String bio
 ) {}
+

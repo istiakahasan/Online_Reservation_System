@@ -12,3 +12,4 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, UUID> {
     List<ServiceEntity> findAllByBusinessId(UUID businessId);
     List<ServiceEntity> findAllByBusinessIdAndIsActiveTrue(UUID businessId);
 }
+

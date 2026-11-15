@@ -31,3 +31,4 @@ public class AvailabilityController {
         return ResponseEntity.ok(availabilityService.findAvailableSlots(query));
     }
 }
+

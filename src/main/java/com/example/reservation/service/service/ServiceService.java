@@ -11,3 +11,4 @@ public interface ServiceService {
     ServiceResponseDto getServiceById(UUID id);
     List<ServiceResponseDto> getActiveServices(UUID businessId);
 }
+

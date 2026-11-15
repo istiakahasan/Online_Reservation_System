@@ -11,3 +11,4 @@ public interface StaffService {
     StaffResponseDto getStaffById(UUID id);
     List<StaffResponseDto> getActiveStaffByBusiness(UUID businessId);
 }
+

@@ -7,3 +7,4 @@ public interface DomainEvent {
     UUID eventId();
     Instant occurredAt();
 }
+

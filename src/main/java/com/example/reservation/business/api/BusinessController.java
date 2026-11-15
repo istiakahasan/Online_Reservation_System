@@ -51,3 +51,4 @@ public class BusinessController {
         return ResponseEntity.ok(businessService.getBusinessBySlug(slug));
     }
 }
+

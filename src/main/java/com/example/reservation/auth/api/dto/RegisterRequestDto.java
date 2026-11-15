@@ -35,3 +35,4 @@ public record RegisterRequestDto(
         @Size(min = 8, message = "Password must be at least 8 characters")
         String password
 ) {}
+

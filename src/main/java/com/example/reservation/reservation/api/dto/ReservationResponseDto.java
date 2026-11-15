@@ -44,3 +44,4 @@ public record ReservationResponseDto(
         @Schema(description = "Booking notes")
         String notes
 ) {}
+
