@@ -1,0 +1,2237 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Online Reservation System API",
+    "version": "1.0.0",
+    "description": "Modular Monolith Multi-Tenant Online Reservation Platform API with high concurrency booking, Stripe payments, and domain event notifications.",
+    "contact": {
+      "name": "API Support",
+      "email": "support@example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local Development Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Endpoints for user authentication, registration, token refresh, and logout"
+    },
+    {
+      "name": "Availability",
+      "description": "Endpoints for finding open time slots for staff and services"
+    },
+    {
+      "name": "Reservations",
+      "description": "Endpoints for booking, payment processing, retrieving, and cancelling reservations"
+    },
+    {
+      "name": "Stripe Webhooks",
+      "description": "Endpoints for handling asynchronous Stripe webhook event callbacks"
+    },
+    {
+      "name": "Payments",
+      "description": "Endpoints for Stripe payment intents and webhooks"
+    },
+    {
+      "name": "Business Tenants",
+      "description": "Endpoints for managing business tenant registrations and profiles"
+    },
+    {
+      "name": "Services Catalog",
+      "description": "Endpoints for managing bookable services offerings"
+    },
+    {
+      "name": "Staff Management",
+      "description": "Endpoints for staff members and service provider profiles"
+    },
+    {
+      "name": "Users",
+      "description": "Endpoints for managing user accounts and profiles"
+    },
+    {
+      "name": "Notifications",
+      "description": "Endpoints for email/SMS communication"
+    }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register customer",
+        "description": "Creates a customer user account under a specific business tenant",
+        "operationId": "registerCustomer",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User successfully registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or invalid request payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already registered for this tenant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "User login",
+        "description": "Authenticates user credentials and returns access token (15m) + refresh token (7d)",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid email or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Rotate refresh token",
+        "description": "Revokes old refresh token and issues a new access token + refresh token pair",
+        "operationId": "refreshToken",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens rotated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token expired or revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logout user",
+        "description": "Revokes the supplied refresh token",
+        "operationId": "logoutUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Logged out successfully"
+          },
+          "400": {
+            "description": "Missing refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get current authenticated user profile",
+        "description": "Resolves user principal from JWT using @CurrentUser",
+        "operationId": "getCurrentUser",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current authenticated user details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticatedUser"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated / Invalid JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/businesses/{businessId}/availability": {
+      "get": {
+        "tags": [
+          "Availability"
+        ],
+        "summary": "Get available appointment slots",
+        "description": "Derives open slots from working hours minus time-off minus active bookings",
+        "operationId": "getAvailability",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "description": "Business tenant UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "serviceId",
+            "in": "query",
+            "required": true,
+            "description": "Service UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "staffId",
+            "in": "query",
+            "required": true,
+            "description": "Staff UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "description": "Target date (YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-11-20"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available time slots",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimeSlotResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Business, service, or staff not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations": {
+      "post": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Create reservation hold",
+        "description": "Initiates a reservation hold pending payment with concurrency checks",
+        "operationId": "createReservation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservationRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Reservation hold created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Slot double-booked or already reserved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}": {
+      "get": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Get reservation details",
+        "description": "Retrieves reservation by UUID",
+        "operationId": "getReservationById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Reservation UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/payment-intent": {
+      "post": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Create Stripe PaymentIntent for reservation",
+        "description": "Creates a PaymentIntent tied to the reservation and returns clientSecret for Stripe Elements",
+        "operationId": "createPaymentIntentForReservation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Reservation UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PaymentIntent created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Reservation is not in PENDING status or hold expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/customer/{customerId}": {
+      "get": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "List customer reservations",
+        "description": "Retrieves all bookings made by a specific customer",
+        "operationId": "getCustomerReservations",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "description": "Customer UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer reservations list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReservationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/cancel": {
+      "put": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Cancel reservation",
+        "description": "Cancels an active or confirmed reservation with refund policies",
+        "operationId": "cancelReservation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Reservation UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "actorId",
+            "in": "query",
+            "required": true,
+            "description": "UUID of user performing cancellation",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "description": "Optional cancellation explanation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Reservation cannot be cancelled in its current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/webhooks/stripe": {
+      "post": {
+        "tags": [
+          "Stripe Webhooks"
+        ],
+        "summary": "Process Stripe Webhook callback",
+        "description": "Verifies signature and idempotently handles payment_intent events",
+        "operationId": "handleStripeWebhook",
+        "parameters": [
+          {
+            "name": "Stripe-Signature",
+            "in": "header",
+            "required": true,
+            "description": "Stripe cryptographic signature header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Raw JSON payload sent by Stripe",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received and processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid signature",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/intent": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Create payment intent",
+        "description": "Initializes a Stripe PaymentIntent for a pending reservation",
+        "operationId": "createPaymentIntent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment intent created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/reservation/{reservationId}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get payment by reservation",
+        "description": "Retrieves payment details for a reservation",
+        "operationId": "getPaymentByReservation",
+        "parameters": [
+          {
+            "name": "reservationId",
+            "in": "path",
+            "required": true,
+            "description": "Reservation UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment details retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/businesses": {
+      "post": {
+        "tags": [
+          "Business Tenants"
+        ],
+        "summary": "Register business tenant",
+        "description": "Creates a new business profile and tenant workspace",
+        "operationId": "createBusiness",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBusinessRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Business successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business slug already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/businesses/{id}": {
+      "get": {
+        "tags": [
+          "Business Tenants"
+        ],
+        "summary": "Get business by ID",
+        "description": "Retrieves business details by UUID",
+        "operationId": "getBusinessById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Business UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Business details retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Business not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/businesses/slug/{slug}": {
+      "get": {
+        "tags": [
+          "Business Tenants"
+        ],
+        "summary": "Get business by vanity slug",
+        "description": "Retrieves business details by URL slug",
+        "operationId": "getBusinessBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Vanity URL slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Business details retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Business not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/services": {
+      "post": {
+        "tags": [
+          "Services Catalog"
+        ],
+        "summary": "Create bookable service",
+        "description": "Adds a new service offering to a business catalog",
+        "operationId": "createService",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateServiceRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Service created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Services Catalog"
+        ],
+        "summary": "List active services",
+        "description": "Retrieves all active offerings for a business tenant",
+        "operationId": "listActiveServices",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": true,
+            "description": "Business UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active services retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/services/{id}": {
+      "get": {
+        "tags": [
+          "Services Catalog"
+        ],
+        "summary": "Get service by ID",
+        "description": "Retrieves service details by UUID",
+        "operationId": "getServiceById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Service UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service details found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/staff": {
+      "post": {
+        "tags": [
+          "Staff Management"
+        ],
+        "summary": "Register staff member",
+        "description": "Creates a staff profile linked to a user account",
+        "operationId": "createStaff",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStaffRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Staff created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Staff Management"
+        ],
+        "summary": "List active staff members",
+        "description": "Lists active staff providers for a business",
+        "operationId": "listActiveStaff",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": true,
+            "description": "Business UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Staff list retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/staff/{id}": {
+      "get": {
+        "tags": [
+          "Staff Management"
+        ],
+        "summary": "Get staff profile by ID",
+        "description": "Retrieves staff details by UUID",
+        "operationId": "getStaffById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Staff UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Staff profile found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Staff profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "List users for tenant",
+        "description": "Retrieves all users belonging to a tenant business",
+        "operationId": "listUsersByBusiness",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": true,
+            "description": "Business UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users listed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user profile",
+        "description": "Retrieves user details by user ID",
+        "operationId": "getUserById",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update user profile",
+        "description": "Updates profile attributes for an existing user",
+        "operationId": "updateUser",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Send notification",
+        "description": "Dispatches an email or SMS notification",
+        "operationId": "sendNotification",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendNotificationRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Notification queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "List notifications",
+        "description": "Retrieves sent notifications for a business",
+        "operationId": "listNotificationsByBusiness",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": true,
+            "description": "Business UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of notifications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Bearer Access Token provided in the Authorization header (Authorization: Bearer <token>)"
+      }
+    },
+    "schemas": {
+      "AuthResponseDto": {
+        "type": "object",
+        "description": "Authentication response with JWT token pair",
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "tokenType",
+          "expiresIn",
+          "userId",
+          "businessId",
+          "role"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "JWT Access Token (15 minute validity)"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Opaque or signed Refresh Token (7 day validity)"
+          },
+          "tokenType": {
+            "type": "string",
+            "example": "Bearer"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64",
+            "example": 900,
+            "description": "Access token expiration window in seconds"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Authenticated user ID"
+          },
+          "businessId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Business tenant ID"
+          },
+          "role": {
+            "type": "string",
+            "example": "CUSTOMER",
+            "enum": [
+              "ADMIN",
+              "BUSINESS_OWNER",
+              "STAFF",
+              "CUSTOMER"
+            ]
+          }
+        }
+      },
+      "LoginRequestDto": {
+        "type": "object",
+        "description": "User authentication request",
+        "required": [
+          "businessId",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "businessId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "client@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "SecureP@ssw0rd123!"
+          }
+        }
+      },
+      "LogoutRequestDto": {
+        "type": "object",
+        "description": "User session logout request",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token to revoke"
+          }
+        }
+      },
+      "RefreshTokenRequestDto": {
+        "type": "object",
+        "description": "Refresh token rotation request",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Existing valid refresh token to be rotated"
+          }
+        }
+      },
+      "RegisterRequestDto": {
+        "type": "object",
+        "description": "Customer registration request",
+        "required": [
+          "businessId",
+          "firstName",
+          "lastName",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "businessId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+1234567890"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "example": "P@ssw0rd123!"
+          }
+        }
+      },
+      "AuthenticatedUser": {
+        "type": "object",
+        "description": "Currently authenticated principal details",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenantId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "BUSINESS_OWNER",
+              "STAFF",
+              "CUSTOMER"
+            ]
+          }
+        }
+      },
+      "TimeSlotResponseDto": {
+        "type": "object",
+        "description": "Computed bookable appointment slot",
+        "required": [
+          "staffId",
+          "startInstant",
+          "endInstant",
+          "localStartTime",
+          "localEndTime",
+          "durationMinutes",
+          "available"
+        ],
+        "properties": {
+          "staffId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startInstant": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start timestamp in UTC (ISO-8601)"
+          },
+          "endInstant": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End timestamp in UTC (ISO-8601)"
+          },
+          "localStartTime": {
+            "type": "string",
+            "description": "Local start time with zone offset (ISO-8601)"
+          },
+          "localEndTime": {
+            "type": "string",
+            "description": "Local end time with zone offset (ISO-8601)"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int64",
+            "example": 60
+          },
+          "available": {
+            "type": "boolean",
+            "description": "True if available for reservation"
+          }
+        }
+      },
+      "CreateReservationRequestDto": {
+        "type": "object",
+        "description": "Create new reservation hold request",
+        "required": [
+          "businessId",
+          "customerId",
+          "serviceId",
+          "staffId",
+          "startTime"
+        ],
+        "properties": {
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Desired appointment start time in UTC"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "description": "Optional customer booking notes"
+          }
+        }
+      },
+      "ReservationResponseDto": {
+        "type": "object",
+        "description": "Reservation booking details",
+        "required": [
+          "id",
+          "businessId",
+          "customerId",
+          "serviceId",
+          "staffId",
+          "startTime",
+          "endTime",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "CANCELLED",
+              "NO_SHOW",
+              "COMPLETED"
+            ]
+          },
+          "totalPrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "example": "USD"
+          },
+          "holdExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PaymentIntentResponseDto": {
+        "type": "object",
+        "description": "Stripe PaymentIntent response for client-side confirmation",
+        "required": [
+          "clientSecret",
+          "paymentIntentId",
+          "amount",
+          "currency",
+          "reservationId"
+        ],
+        "properties": {
+          "clientSecret": {
+            "type": "string",
+            "description": "Client secret for Stripe.js / Stripe Elements"
+          },
+          "paymentIntentId": {
+            "type": "string",
+            "description": "Stripe PaymentIntent ID (pi_...)"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "reservationId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CreatePaymentRequestDto": {
+        "type": "object",
+        "required": [
+          "reservationId",
+          "amount"
+        ],
+        "properties": {
+          "reservationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          }
+        }
+      },
+      "PaymentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reservationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stripePaymentIntentId": {
+            "type": "string"
+          },
+          "clientSecret": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateBusinessRequestDto": {
+        "type": "object",
+        "required": [
+          "name",
+          "slug",
+          "timezone",
+          "email"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "The Parisian Bistro"
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "example": "parisian-bistro"
+          },
+          "timezone": {
+            "type": "string",
+            "example": "America/New_York"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "contact@parisianbistro.com"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+12125550199"
+          }
+        }
+      },
+      "BusinessResponseDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "timezone",
+          "email"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "The Parisian Bistro"
+          },
+          "slug": {
+            "type": "string",
+            "example": "parisian-bistro"
+          },
+          "timezone": {
+            "type": "string",
+            "example": "America/New_York"
+          },
+          "email": {
+            "type": "string",
+            "example": "contact@parisianbistro.com"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+12125550199"
+          },
+          "status": {
+            "type": "string",
+            "example": "ACTIVE"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateServiceRequestDto": {
+        "type": "object",
+        "required": [
+          "businessId",
+          "name",
+          "durationMinutes",
+          "priceAmount"
+        ],
+        "properties": {
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "Deep Tissue Massage 60m"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 60
+          },
+          "priceAmount": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0.01,
+            "example": 85.0
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          }
+        }
+      },
+      "ServiceResponseDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "businessId",
+          "name",
+          "durationMinutes",
+          "priceAmount"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "Deep Tissue Massage 60m"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "example": 60
+          },
+          "priceAmount": {
+            "type": "number",
+            "format": "double",
+            "example": 85.0
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "CreateStaffRequestDto": {
+        "type": "object",
+        "required": [
+          "businessId",
+          "userId",
+          "jobTitle"
+        ],
+        "properties": {
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "jobTitle": {
+            "type": "string",
+            "example": "Senior Stylist"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "StaffResponseDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "businessId",
+          "userId",
+          "fullName",
+          "jobTitle"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Marcus Vance"
+          },
+          "jobTitle": {
+            "type": "string",
+            "example": "Senior Stylist"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "businessId",
+          "firstName",
+          "lastName",
+          "email",
+          "role",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Jane"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "jane.doe@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+1987654321"
+          },
+          "role": {
+            "type": "string",
+            "example": "CUSTOMER"
+          },
+          "status": {
+            "type": "string",
+            "example": "ACTIVE"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UpdateUserRequestDto": {
+        "type": "object",
+        "required": [
+          "firstName",
+          "lastName"
+        ],
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Jane"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+1987654321"
+          }
+        }
+      },
+      "SendNotificationRequestDto": {
+        "type": "object",
+        "required": [
+          "businessId",
+          "recipientEmail",
+          "subject",
+          "content"
+        ],
+        "properties": {
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipientEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "NotificationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipientEmail": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WebhookResponseDto": {
+        "type": "object",
+        "properties": {
+          "received": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "ErrorResponseDto": {
+        "type": "object",
+        "description": "Standard API error response envelope",
+        "required": [
+          "status",
+          "errorCode",
+          "message",
+          "timestamp"
+        ],
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "errorCode": {
+            "type": "string",
+            "example": "VALIDATION_FAILED"
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid request payload"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "Field-level validation error details"
+          }
+        }
+      }
+    }
+  }
+}
