@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping({"/api/reservations", "/api/v1/reservations"})
+@RequestMapping({ "/api/reservations", "/api/v1/reservations" })
 @RequiredArgsConstructor
 @Tag(name = "Reservations", description = "Endpoints for booking, retrieving, and cancelling reservations")
 public class ReservationController {
@@ -36,7 +36,8 @@ public class ReservationController {
     @Operation(summary = "Create reservation", description = "Initiates a reservation hold pending payment")
     @ApiResponse(responseCode = "201", description = "Reservation hold created")
     @ApiResponse(responseCode = "409", description = "Slot double-booked or unavailable")
-    public ResponseEntity<ReservationResponseDto> createReservation(@Valid @RequestBody CreateReservationRequestDto request) {
+    public ResponseEntity<ReservationResponseDto> createReservation(
+            @Valid @RequestBody CreateReservationRequestDto request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.createReservation(request));
     }
 
@@ -63,8 +64,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponseDto> cancelReservation(
             @PathVariable UUID id,
             @RequestParam UUID actorId,
-            @RequestParam(required = false) String reason
-    ) {
+            @RequestParam(required = false) String reason) {
         return ResponseEntity.ok(reservationService.cancelReservation(id, actorId, reason));
     }
 }

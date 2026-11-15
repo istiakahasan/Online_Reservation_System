@@ -1,5 +1,6 @@
 package com.example.reservation.business.domain;
 
+import com.example.reservation.reservation.domain.policy.RefundPolicyType;
 import com.example.reservation.shared.domain.BaseAuditableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -48,6 +50,13 @@ public class BusinessEntity extends BaseAuditableEntity {
     @Column(name = "status", nullable = false, length = 50)
     private BusinessStatus status = BusinessStatus.ACTIVE;
 
+    @Column(name = "cancellation_window_hours", nullable = false)
+    private Integer cancellationWindowHours = 24;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "refund_policy_type", nullable = false, length = 50)
+    private RefundPolicyType refundPolicyType = RefundPolicyType.FULL;
+
     public BusinessEntity(String name, String slug, String timezone, String email, String phone) {
         this.name = name;
         this.slug = slug;
@@ -55,6 +64,18 @@ public class BusinessEntity extends BaseAuditableEntity {
         this.email = email;
         this.phone = phone;
         this.status = BusinessStatus.ACTIVE;
+        this.cancellationWindowHours = 24;
+        this.refundPolicyType = RefundPolicyType.FULL;
+    }
+
+    public BusinessEntity(String name, String slug, String timezone, String email, String phone, Integer cancellationWindowHours, RefundPolicyType refundPolicyType) {
+        this(name, slug, timezone, email, phone);
+        this.cancellationWindowHours = cancellationWindowHours != null ? cancellationWindowHours : 24;
+        this.refundPolicyType = refundPolicyType != null ? refundPolicyType : RefundPolicyType.FULL;
+    }
+
+    public Duration getCancellationWindow() {
+        return Duration.ofHours(cancellationWindowHours != null ? cancellationWindowHours : 24);
     }
 
     @Override
@@ -70,4 +91,3 @@ public class BusinessEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
-
