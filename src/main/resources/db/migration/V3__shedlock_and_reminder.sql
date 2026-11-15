@@ -20,3 +20,4 @@ ALTER TABLE reservations
 CREATE INDEX IF NOT EXISTS idx_reservations_reminders 
     ON reservations (status, start_time) 
     WHERE status = 'CONFIRMED' AND reminder_sent_at IS NULL;
+

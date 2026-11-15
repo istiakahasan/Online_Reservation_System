@@ -258,3 +258,4 @@ class ShedLockConcurrencyIntegrationTest {
         assertThat(lockCount).isEqualTo(1);
     }
 }
+

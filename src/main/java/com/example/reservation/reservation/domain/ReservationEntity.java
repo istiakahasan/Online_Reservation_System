@@ -79,15 +79,15 @@ public class ReservationEntity extends BaseAuditableEntity {
     private String notes;
 
     public ReservationEntity(BusinessEntity business,
-                             UserEntity customer,
-                             ServiceEntity service,
-                             UserEntity staff,
-                             Instant startTime,
-                             Instant endTime,
-                             BigDecimal totalPrice,
-                             String currency,
-                             Instant holdExpiresAt,
-                             String notes) {
+            UserEntity customer,
+            ServiceEntity service,
+            UserEntity staff,
+            Instant startTime,
+            Instant endTime,
+            BigDecimal totalPrice,
+            String currency,
+            Instant holdExpiresAt,
+            String notes) {
         this.business = business;
         this.customer = customer;
         this.service = service;
@@ -103,8 +103,10 @@ public class ReservationEntity extends BaseAuditableEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ReservationEntity that = (ReservationEntity) o;
         return id != null && Objects.equals(id, that.id);
     }
@@ -114,4 +116,3 @@ public class ReservationEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
-
