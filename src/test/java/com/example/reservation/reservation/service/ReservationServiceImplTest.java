@@ -8,7 +8,6 @@ import com.example.reservation.reservation.api.dto.CreateReservationRequestDto;
 import com.example.reservation.reservation.api.dto.ReservationResponseDto;
 import com.example.reservation.reservation.domain.ReservationEntity;
 import com.example.reservation.reservation.domain.ReservationStatus;
-import com.example.reservation.reservation.domain.event.ReservationCancelled;
 import com.example.reservation.reservation.domain.event.ReservationCreatedEvent;
 import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedException;
 import com.example.reservation.reservation.repo.ReservationRepository;
@@ -64,6 +63,9 @@ class ReservationServiceImplTest {
 
     @Mock
     private AvailabilityService availabilityService;
+
+    @Mock
+    private CancelReservationUseCase cancelReservationUseCase;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -167,7 +169,6 @@ class ReservationServiceImplTest {
         when(userRepository.findById(staffId)).thenReturn(Optional.of(staff));
         when(serviceRepository.findById(serviceId)).thenReturn(Optional.of(service));
 
-        // Returns no available slots
         when(availabilityService.computeSlots(eq(businessId), eq(serviceId), eq(staffId), any(LocalDate.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -202,7 +203,6 @@ class ReservationServiceImplTest {
         when(availabilityService.computeSlots(eq(businessId), eq(serviceId), eq(staffId), any(LocalDate.class)))
                 .thenReturn(List.of(availableSlot));
 
-        // Simulate concurrent insert hitting the partial unique index
         when(reservationRepository.saveAndFlush(any(ReservationEntity.class)))
                 .thenThrow(new DataIntegrityViolationException("ERROR: duplicate key value violates unique constraint \"uq_reservations_staff_active_slot\""));
 
@@ -228,7 +228,7 @@ class ReservationServiceImplTest {
     }
 
     @Test
-    @DisplayName("cancelReservation: Successfully transitions status to CANCELLED and emits ReservationCancelled")
+    @DisplayName("cancelReservation: Successfully delegates to CancelReservationUseCase")
     void cancelReservation_Success() {
         UUID reservationId = UUID.randomUUID();
         ReservationEntity reservation = new ReservationEntity(
@@ -236,16 +236,19 @@ class ReservationServiceImplTest {
                 testStartTime.plus(Duration.ofMinutes(60)), new BigDecimal("65.00"), "USD", null, null
         );
         reservation.setId(reservationId);
-        reservation.setStatus(ReservationStatus.PENDING);
+        reservation.setStatus(ReservationStatus.CANCELLED);
 
-        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         when(userRepository.findById(customerId)).thenReturn(Optional.of(customer));
-        when(reservationRepository.saveAndFlush(any(ReservationEntity.class))).thenAnswer(i -> i.getArgument(0));
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        CancelReservationResult cancelResult = new CancelReservationResult(
+                reservationId, "CANCELLED", true, false, false, BigDecimal.ZERO, null, "NONE", "User changed plans"
+        );
+        when(cancelReservationUseCase.execute(any(CancelReservationCommand.class))).thenReturn(cancelResult);
 
         ReservationResponseDto response = reservationService.cancelReservation(reservationId, customerId, "User changed plans");
 
         assertThat(response.status()).isEqualTo("CANCELLED");
-        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELLED);
-        verify(eventPublisher).publishEvent(any(ReservationCancelled.class));
+        verify(cancelReservationUseCase).execute(any(CancelReservationCommand.class));
     }
 }

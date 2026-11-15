@@ -45,6 +45,9 @@ public class PaymentEntity extends BaseAuditableEntity {
     @Column(name = "stripe_payment_intent_id", unique = true, length = 255)
     private String stripePaymentIntentId;
 
+    @Column(name = "stripe_refund_id", length = 255)
+    private String stripeRefundId;
+
     @Column(name = "amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
@@ -60,6 +63,11 @@ public class PaymentEntity extends BaseAuditableEntity {
         this.amount = amount;
         this.currency = currency != null ? currency : "USD";
         this.status = status;
+    }
+
+    public PaymentEntity(BusinessEntity business, ReservationEntity reservation, String stripePaymentIntentId, BigDecimal amount, String currency, String status) {
+        this(business, reservation, amount, currency, status);
+        this.stripePaymentIntentId = stripePaymentIntentId;
     }
 
     @Override

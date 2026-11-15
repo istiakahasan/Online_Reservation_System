@@ -7,8 +7,6 @@ import com.example.reservation.business.repo.BusinessRepository;
 import com.example.reservation.reservation.api.dto.CreateReservationRequestDto;
 import com.example.reservation.reservation.api.dto.ReservationResponseDto;
 import com.example.reservation.reservation.domain.ReservationEntity;
-import com.example.reservation.reservation.domain.ReservationStateMachine;
-import com.example.reservation.reservation.domain.event.ReservationCancelled;
 import com.example.reservation.reservation.domain.event.ReservationCreatedEvent;
 import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedException;
 import com.example.reservation.reservation.repo.ReservationRepository;
@@ -45,6 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final UserRepository userRepository;
     private final ServiceRepository serviceRepository;
     private final AvailabilityService availabilityService;
+    private final CancelReservationUseCase cancelReservationUseCase;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -166,23 +165,23 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional
     public ReservationResponseDto cancelReservation(UUID id, UUID actorId, String reason) {
-        ReservationEntity reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new AppException("Reservation not found with ID: " + id,
-                        "RESERVATION_NOT_FOUND", HttpStatus.NOT_FOUND) {});
-
         UserEntity actor = userRepository.findById(actorId)
                 .orElseThrow(() -> new AppException("Actor not found with ID: " + actorId,
                         "ACTOR_NOT_FOUND", HttpStatus.NOT_FOUND) {});
 
-        ReservationStateMachine stateMachine = ReservationStateMachine.of(reservation);
-        ReservationCancelled event = stateMachine.cancel(actorId, actor.getRole(), reason);
+        CancelReservationCommand command = new CancelReservationCommand(
+                id,
+                actorId,
+                actor.getRole(),
+                reason != null ? reason : "Cancelled by user"
+        );
 
-        reservation.setStatus(stateMachine.getCurrentStatus());
-        ReservationEntity updated = reservationRepository.saveAndFlush(reservation);
+        cancelReservationUseCase.execute(command);
 
-        eventPublisher.publishEvent(event);
+        ReservationEntity updated = reservationRepository.findById(id)
+                .orElseThrow(() -> new AppException("Reservation not found with ID: " + id,
+                        "RESERVATION_NOT_FOUND", HttpStatus.NOT_FOUND) {});
 
         return mapToDto(updated);
     }

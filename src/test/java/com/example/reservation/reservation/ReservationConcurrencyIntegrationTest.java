@@ -362,3 +362,4 @@ class ReservationConcurrencyIntegrationTest {
         assertThat(eventListener.getReceivedEventCount()).isEqualTo(1);
     }
 }
+
