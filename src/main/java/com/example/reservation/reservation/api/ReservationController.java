@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/reservations")
+@RequestMapping({"/api/reservations", "/api/v1/reservations"})
 @RequiredArgsConstructor
 @Tag(name = "Reservations", description = "Endpoints for booking, retrieving, and cancelling reservations")
 public class ReservationController {
@@ -68,4 +68,3 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.cancelReservation(id, actorId, reason));
     }
 }
-
