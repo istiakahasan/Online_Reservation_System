@@ -36,3 +36,4 @@ public class StripeWebhookController {
         return ResponseEntity.ok(Map.of("received", true));
     }
 }
+

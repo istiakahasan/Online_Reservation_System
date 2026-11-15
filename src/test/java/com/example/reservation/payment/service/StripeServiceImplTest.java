@@ -300,3 +300,4 @@ class StripeServiceImplTest {
         assertThat(failedEvent.failureMessage()).contains("Insufficient funds");
     }
 }
+

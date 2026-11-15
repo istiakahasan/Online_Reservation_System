@@ -12,3 +12,4 @@ public interface StripeEventRepository extends JpaRepository<StripeEventEntity, 
     boolean existsByEventId(String eventId);
     Optional<StripeEventEntity> findByEventId(String eventId);
 }
+

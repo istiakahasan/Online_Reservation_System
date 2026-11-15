@@ -5,7 +5,7 @@ import com.example.reservation.reservation.domain.ReservationEntity;
 import com.example.reservation.reservation.domain.ReservationStatus;
 import com.example.reservation.reservation.domain.event.ReservationCancelled;
 import com.example.reservation.reservation.domain.event.ReservationNoShow;
-import com.example.reservation.reservation.domain.event.ReservationReminderEvent;
+import com.example.reservation.reservation.domain.event.ReservationReminderDue;
 import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.service.domain.ServiceEntity;
 import com.example.reservation.user.domain.UserEntity;
@@ -126,10 +126,10 @@ class ReservationScheduledJobsTest {
 
         verify(reservationRepository).save(confirmed);
 
-        ArgumentCaptor<ReservationReminderEvent> eventCaptor = ArgumentCaptor.forClass(ReservationReminderEvent.class);
+        ArgumentCaptor<ReservationReminderDue> eventCaptor = ArgumentCaptor.forClass(ReservationReminderDue.class);
         verify(eventPublisher).publishEvent(eventCaptor.capture());
 
-        ReservationReminderEvent reminderEvent = eventCaptor.getValue();
+        ReservationReminderDue reminderEvent = eventCaptor.getValue();
         assertThat(reminderEvent.reservationId()).isEqualTo(confirmed.getId());
         assertThat(reminderEvent.customerId()).isEqualTo(customer.getId());
         assertThat(reminderEvent.startTime()).isEqualTo(startTime);

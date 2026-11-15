@@ -11,3 +11,4 @@ public record PaymentFailedEvent(
         String failureMessage,
         Instant occurredAt
 ) {}
+
