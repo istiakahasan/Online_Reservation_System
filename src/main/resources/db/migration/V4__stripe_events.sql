@@ -18,3 +18,4 @@ CREATE TABLE IF NOT EXISTS stripe_events (
 
 CREATE INDEX IF NOT EXISTS idx_stripe_events_event_id ON stripe_events (event_id);
 CREATE INDEX IF NOT EXISTS idx_stripe_events_event_type ON stripe_events (event_type);
+

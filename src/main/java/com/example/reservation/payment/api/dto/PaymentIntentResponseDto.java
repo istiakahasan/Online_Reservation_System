@@ -22,3 +22,4 @@ public record PaymentIntentResponseDto(
         @Schema(description = "Associated reservation UUID")
         UUID reservationId
 ) {}
+

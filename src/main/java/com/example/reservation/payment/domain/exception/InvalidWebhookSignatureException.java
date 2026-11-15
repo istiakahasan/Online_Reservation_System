@@ -9,3 +9,4 @@ public class InvalidWebhookSignatureException extends AppException {
         super(message, "INVALID_WEBHOOK_SIGNATURE", HttpStatus.BAD_REQUEST);
     }
 }
+

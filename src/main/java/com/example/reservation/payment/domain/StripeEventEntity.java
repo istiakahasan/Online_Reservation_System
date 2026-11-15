@@ -59,3 +59,4 @@ public class StripeEventEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

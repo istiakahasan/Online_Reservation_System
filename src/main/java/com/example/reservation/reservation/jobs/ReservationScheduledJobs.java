@@ -5,7 +5,7 @@ import com.example.reservation.reservation.domain.ReservationStateMachine;
 import com.example.reservation.reservation.domain.ReservationStatus;
 import com.example.reservation.reservation.domain.event.ReservationCancelled;
 import com.example.reservation.reservation.domain.event.ReservationNoShow;
-import com.example.reservation.reservation.domain.event.ReservationReminderEvent;
+import com.example.reservation.reservation.domain.event.ReservationReminderDue;
 import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.user.domain.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -101,7 +101,7 @@ public class ReservationScheduledJobs {
                 reservation.setReminderSentAt(now);
                 reservationRepository.save(reservation);
 
-                ReservationReminderEvent event = new ReservationReminderEvent(
+                ReservationReminderDue event = new ReservationReminderDue(
                         reservation.getId(),
                         reservation.getBusiness().getId(),
                         reservation.getCustomer().getId(),

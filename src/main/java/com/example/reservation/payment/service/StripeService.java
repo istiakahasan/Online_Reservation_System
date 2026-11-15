@@ -22,3 +22,4 @@ public interface StripeService {
      */
     void processWebhookEvent(String payload, String sigHeader);
 }
+
