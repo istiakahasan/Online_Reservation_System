@@ -73,6 +73,7 @@ CREATE TABLE services (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     duration_minutes INT NOT NULL,
+    buffer_minutes INT NOT NULL DEFAULT 0,
     price_amount NUMERIC(12, 2) NOT NULL,
     currency VARCHAR(3) NOT NULL DEFAULT 'USD',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -83,11 +84,54 @@ CREATE TABLE services (
     CONSTRAINT fk_services_business FOREIGN KEY (business_id) 
         REFERENCES businesses (id) ON DELETE CASCADE,
     CONSTRAINT chk_services_duration CHECK (duration_minutes > 0),
+    CONSTRAINT chk_services_buffer CHECK (buffer_minutes >= 0),
     CONSTRAINT chk_services_price CHECK (price_amount >= 0)
 );
 
 -- =============================================================================
--- 5. Table: reservations (Booking Transactions)
+-- 5. Table: staff_working_hours (Weekly Shift Schedules)
+-- =============================================================================
+CREATE TABLE staff_working_hours (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_id UUID NOT NULL,
+    staff_id UUID NOT NULL,
+    day_of_week VARCHAR(10) NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    created_by VARCHAR(255) NOT NULL DEFAULT 'SYSTEM',
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT fk_staff_working_hours_business FOREIGN KEY (business_id)
+        REFERENCES businesses (id) ON DELETE CASCADE,
+    CONSTRAINT fk_staff_working_hours_staff FOREIGN KEY (staff_id)
+        REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT chk_staff_working_hours_time CHECK (end_time > start_time)
+);
+
+-- =============================================================================
+-- 6. Table: staff_time_off (Exceptions & Holidays)
+-- =============================================================================
+CREATE TABLE staff_time_off (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_id UUID NOT NULL,
+    staff_id UUID NOT NULL,
+    start_time TIMESTAMPTZ NOT NULL,
+    end_time TIMESTAMPTZ NOT NULL,
+    reason VARCHAR(255),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    created_by VARCHAR(255) NOT NULL DEFAULT 'SYSTEM',
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT fk_staff_time_off_business FOREIGN KEY (business_id)
+        REFERENCES businesses (id) ON DELETE CASCADE,
+    CONSTRAINT fk_staff_time_off_staff FOREIGN KEY (staff_id)
+        REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT chk_staff_time_off_range CHECK (end_time > start_time)
+);
+
+-- =============================================================================
+-- 7. Table: reservations (Booking Transactions)
 -- =============================================================================
 CREATE TABLE reservations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -122,7 +166,7 @@ CREATE TABLE reservations (
 );
 
 -- =============================================================================
--- 6. Indexes & Performance Optimization
+-- 8. Indexes & Performance Optimization
 -- =============================================================================
 
 -- Businesses
@@ -138,6 +182,10 @@ CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens (user_id);
 
 -- Services
 CREATE INDEX idx_services_business_active ON services (business_id, is_active);
+
+-- Staff Scheduling & Time-Off
+CREATE INDEX idx_staff_working_hours ON staff_working_hours (staff_id, day_of_week);
+CREATE INDEX idx_staff_time_off ON staff_time_off (staff_id, start_time, end_time);
 
 -- Reservations: Operational and Calendar Lookups
 CREATE INDEX idx_reservations_business_start_time ON reservations (business_id, start_time);

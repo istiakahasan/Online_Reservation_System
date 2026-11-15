@@ -3,23 +3,29 @@ package com.example.reservation.availability.api.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
-@Schema(description = "Computed bookable time slot")
+@Schema(description = "Computed bookable appointment slot")
 public record TimeSlotResponseDto(
         @Schema(description = "Assigned staff member ID")
         UUID staffId,
 
-        @Schema(description = "Staff full name", example = "Marcus Vance")
-        String staffName,
+        @Schema(description = "Start timestamp in UTC")
+        Instant startInstant,
 
-        @Schema(description = "Slot start time (UTC)")
-        Instant startTime,
+        @Schema(description = "End timestamp in UTC")
+        Instant endInstant,
 
-        @Schema(description = "Slot end time (UTC)")
-        Instant endTime,
+        @Schema(description = "Local start time in business timezone")
+        ZonedDateTime localStartTime,
 
-        @Schema(description = "Slot availability status")
+        @Schema(description = "Local end time in business timezone")
+        ZonedDateTime localEndTime,
+
+        @Schema(description = "Duration in minutes")
+        long durationMinutes,
+
+        @Schema(description = "Whether the slot is currently open for booking")
         boolean available
 ) {}
-
