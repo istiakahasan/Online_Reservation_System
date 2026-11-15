@@ -18,3 +18,4 @@ public class NoRefundPolicy implements RefundPolicy {
         return new RefundDecision(false, BigDecimal.ZERO, getPolicyType(), "Non-refundable booking per business policy");
     }
 }
+

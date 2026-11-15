@@ -21,3 +21,4 @@ public class FullRefundPolicy implements RefundPolicy {
         return new RefundDecision(true, amountPaid, getPolicyType(), "Full refund granted per business policy");
     }
 }
+

@@ -5,3 +5,4 @@ public enum RefundPolicyType {
     PARTIAL,
     NONE
 }
+

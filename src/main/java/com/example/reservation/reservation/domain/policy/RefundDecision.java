@@ -8,3 +8,4 @@ public record RefundDecision(
         RefundPolicyType policyType,
         String reason
 ) {}
+

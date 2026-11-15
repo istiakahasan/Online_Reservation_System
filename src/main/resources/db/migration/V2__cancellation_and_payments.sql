@@ -52,3 +52,4 @@ CREATE INDEX IF NOT EXISTS idx_payments_reservation_id ON payments (reservation_
 CREATE INDEX IF NOT EXISTS idx_payments_stripe_pi ON payments (stripe_payment_intent_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_business_id ON notifications (business_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_status ON notifications (status);
+
