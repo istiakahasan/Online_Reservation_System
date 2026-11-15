@@ -45,6 +45,9 @@ public class ServiceEntity extends BaseAuditableEntity {
     @Column(name = "duration_minutes", nullable = false)
     private Integer durationMinutes;
 
+    @Column(name = "buffer_minutes", nullable = false)
+    private Integer bufferMinutes = 0;
+
     @Column(name = "price_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal priceAmount;
 
@@ -54,11 +57,12 @@ public class ServiceEntity extends BaseAuditableEntity {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    public ServiceEntity(BusinessEntity business, String name, String description, Integer durationMinutes, BigDecimal priceAmount, String currency) {
+    public ServiceEntity(BusinessEntity business, String name, String description, Integer durationMinutes, Integer bufferMinutes, BigDecimal priceAmount, String currency) {
         this.business = business;
         this.name = name;
         this.description = description;
         this.durationMinutes = durationMinutes;
+        this.bufferMinutes = bufferMinutes != null ? bufferMinutes : 0;
         this.priceAmount = priceAmount;
         this.currency = currency != null ? currency : "USD";
         this.isActive = true;
@@ -77,4 +81,3 @@ public class ServiceEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
-
