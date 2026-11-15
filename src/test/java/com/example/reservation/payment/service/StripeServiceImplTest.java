@@ -13,6 +13,7 @@ import com.example.reservation.reservation.domain.ReservationStatus;
 import com.example.reservation.reservation.domain.event.ReservationConfirmed;
 import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedException;
 import com.example.reservation.reservation.repo.ReservationRepository;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.service.domain.ServiceEntity;
 import com.example.reservation.user.domain.UserEntity;
 import com.example.reservation.user.domain.UserRole;
@@ -52,6 +53,9 @@ class StripeServiceImplTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private ReservationMetrics reservationMetrics;
+
     private StripeServiceImpl stripeService;
 
     private static final String TEST_WEBHOOK_SECRET = "whsec_test_secret_for_unit_tests_123456";
@@ -71,6 +75,7 @@ class StripeServiceImplTest {
                 paymentRepository,
                 stripeEventRepository,
                 eventPublisher,
+                reservationMetrics,
                 "mock-api-key",
                 TEST_WEBHOOK_SECRET
         );

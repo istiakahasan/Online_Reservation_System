@@ -13,6 +13,7 @@ import com.example.reservation.reservation.domain.ReservationStatus;
 import com.example.reservation.reservation.domain.event.ReservationConfirmed;
 import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedException;
 import com.example.reservation.reservation.repo.ReservationRepository;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.shared.exception.AppException;
 import com.example.reservation.user.domain.UserRole;
 import com.stripe.Stripe;
@@ -47,6 +48,7 @@ public class StripeServiceImpl implements StripeService {
     private final PaymentRepository paymentRepository;
     private final StripeEventRepository stripeEventRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ReservationMetrics reservationMetrics;
 
     private final String apiKey;
     private final String webhookSecret;
@@ -56,6 +58,7 @@ public class StripeServiceImpl implements StripeService {
             PaymentRepository paymentRepository,
             StripeEventRepository stripeEventRepository,
             ApplicationEventPublisher eventPublisher,
+            ReservationMetrics reservationMetrics,
             @Value("${application.stripe.api-key:mock-stripe-key}") String apiKey,
             @Value("${application.stripe.webhook-secret:mock-webhook-secret}") String webhookSecret
     ) {
@@ -63,6 +66,7 @@ public class StripeServiceImpl implements StripeService {
         this.paymentRepository = paymentRepository;
         this.stripeEventRepository = stripeEventRepository;
         this.eventPublisher = eventPublisher;
+        this.reservationMetrics = reservationMetrics;
         this.apiKey = apiKey;
         this.webhookSecret = webhookSecret;
 
@@ -119,6 +123,7 @@ public class StripeServiceImpl implements StripeService {
                 log.info("Stripe PaymentIntent created: id={}", paymentIntentId);
             } catch (StripeException e) {
                 log.error("Failed to create Stripe PaymentIntent: {}", e.getMessage(), e);
+                reservationMetrics.recordPaymentFailure(reservation.getBusiness().getId(), e.getMessage());
                 throw new AppException("Stripe PaymentIntent creation failed: " + e.getMessage(),
                         "STRIPE_API_ERROR", HttpStatus.BAD_GATEWAY) {};
             }
@@ -263,6 +268,8 @@ public class StripeServiceImpl implements StripeService {
 
         String failureMsg = paymentIntent.getLastPaymentError() != null ?
                 paymentIntent.getLastPaymentError().getMessage() : "Payment authentication or funds failure";
+
+        reservationMetrics.recordPaymentFailure(reservation.getBusiness().getId(), failureMsg);
 
         eventPublisher.publishEvent(new PaymentFailedEvent(
                 reservation.getId(),

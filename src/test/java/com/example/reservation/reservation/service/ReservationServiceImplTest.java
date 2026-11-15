@@ -13,6 +13,7 @@ import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedExc
 import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.service.domain.ServiceEntity;
 import com.example.reservation.service.repo.ServiceRepository;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.shared.exception.AppException;
 import com.example.reservation.user.domain.UserEntity;
 import com.example.reservation.user.domain.UserRole;
@@ -69,6 +70,9 @@ class ReservationServiceImplTest {
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private ReservationMetrics reservationMetrics;
 
     @InjectMocks
     private ReservationServiceImpl reservationService;
