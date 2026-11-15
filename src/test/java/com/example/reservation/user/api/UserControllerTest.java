@@ -1,0 +1,31 @@
+package com.example.reservation.user.api;
+
+import com.example.reservation.user.service.UserService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@WebMvcTest(UserController.class)
+@AutoConfigureMockMvc(addFilters = false)
+class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService;
+
+    @Test
+    @DisplayName("UserController context loads successfully")
+    void contextLoads() {
+        assertThat(mockMvc).isNotNull();
+        assertThat(userService).isNotNull();
+    }
+}
+
