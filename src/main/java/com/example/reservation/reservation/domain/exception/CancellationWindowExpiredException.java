@@ -21,3 +21,4 @@ public class CancellationWindowExpiredException extends AppException {
         super(message, "CANCELLATION_WINDOW_EXPIRED", HttpStatus.CONFLICT);
     }
 }
+

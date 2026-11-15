@@ -26,6 +26,7 @@
         <stripe.version>28.0.0</stripe.version>
         <springdoc.version>2.6.0</springdoc.version>
         <redisson.version>3.37.0</redisson.version>
+        <shedlock.version>5.16.0</shedlock.version>
     </properties>
 
     <dependencies>
@@ -113,6 +114,18 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+        <!-- Distributed Scheduling: ShedLock -->
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+            <version>${shedlock.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-provider-jdbc-template</artifactId>
+            <version>${shedlock.version}</version>
         </dependency>
 
         <!-- OpenAPI / Swagger Documentation -->

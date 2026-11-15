@@ -25,3 +25,4 @@ public class WindowBasedCancellationPolicy implements CancellationPolicy {
         return !checkTime.isAfter(latestAllowedCancellationTime);
     }
 }
+

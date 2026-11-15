@@ -16,3 +16,4 @@ public record CancelReservationCommand(
         this(reservationId, actorId, actorRole, reason, Instant.now());
     }
 }
+

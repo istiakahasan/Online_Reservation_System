@@ -18,3 +18,4 @@ public class FlexibleCancellationPolicy implements CancellationPolicy {
         return checkTime.isBefore(reservation.getStartTime());
     }
 }
+

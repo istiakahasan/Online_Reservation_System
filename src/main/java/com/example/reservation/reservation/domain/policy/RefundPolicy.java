@@ -10,3 +10,4 @@ public interface RefundPolicy {
 
     RefundDecision calculateRefund(ReservationEntity reservation, BigDecimal amountPaid);
 }
+

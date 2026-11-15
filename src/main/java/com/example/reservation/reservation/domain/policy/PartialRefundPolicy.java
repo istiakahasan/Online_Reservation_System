@@ -35,3 +35,4 @@ public class PartialRefundPolicy implements RefundPolicy {
                 String.format("Partial refund of %s%% granted per business policy", percentage.stripTrailingZeros().toPlainString()));
     }
 }
+

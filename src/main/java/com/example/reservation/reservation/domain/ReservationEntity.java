@@ -72,6 +72,9 @@ public class ReservationEntity extends BaseAuditableEntity {
     @Column(name = "hold_expires_at")
     private Instant holdExpiresAt;
 
+    @Column(name = "reminder_sent_at")
+    private Instant reminderSentAt;
+
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 

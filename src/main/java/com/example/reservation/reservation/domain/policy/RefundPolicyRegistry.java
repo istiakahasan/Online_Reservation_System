@@ -24,3 +24,4 @@ public class RefundPolicyRegistry {
         return policies.getOrDefault(type, policies.get(RefundPolicyType.FULL));
     }
 }
+
