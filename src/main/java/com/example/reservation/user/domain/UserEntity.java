@@ -80,3 +80,4 @@ public class UserEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

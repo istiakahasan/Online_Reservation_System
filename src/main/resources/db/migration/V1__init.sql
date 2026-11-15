@@ -135,3 +135,4 @@ CREATE INDEX idx_reservations_pending_expiration ON reservations (hold_expires_a
 CREATE UNIQUE INDEX uq_reservations_staff_active_slot 
     ON reservations (staff_id, start_time) 
     WHERE status IN ('PENDING', 'CONFIRMED');
+

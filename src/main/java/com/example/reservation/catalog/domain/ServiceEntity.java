@@ -77,3 +77,4 @@ public class ServiceEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

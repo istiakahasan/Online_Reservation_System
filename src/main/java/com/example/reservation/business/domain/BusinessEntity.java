@@ -70,3 +70,4 @@ public class BusinessEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+
