@@ -7,3 +7,4 @@ export default function BusinessLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+

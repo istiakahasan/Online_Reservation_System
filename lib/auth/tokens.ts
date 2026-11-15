@@ -152,3 +152,4 @@ export function isJwtExpired(token: string, bufferSeconds = 10): boolean {
   const currentTime = Math.floor(Date.now() / 1000);
   return payload.exp <= currentTime + bufferSeconds;
 }
+

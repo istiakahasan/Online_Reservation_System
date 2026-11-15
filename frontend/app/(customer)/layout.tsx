@@ -7,3 +7,4 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+

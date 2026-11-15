@@ -844,3 +844,4 @@ export type UpdateUserRequest = components["schemas"]["UpdateUserRequestDto"];
 export type SendNotificationRequest = components["schemas"]["SendNotificationRequestDto"];
 export type NotificationResponse = components["schemas"]["NotificationResponseDto"];
 export type ErrorResponse = components["schemas"]["ErrorResponseDto"];
+
