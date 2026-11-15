@@ -82,7 +82,7 @@ class EmailChannelTest {
                 Map.of()
         );
 
-        when(templateEngine.process(any(), any(Context.class)))
+        when(templateEngine.process(any(String.class), any(Context.class)))
                 .thenThrow(new RuntimeException("Template processing syntax error"));
 
         assertThatThrownBy(() -> emailChannel.send(request))

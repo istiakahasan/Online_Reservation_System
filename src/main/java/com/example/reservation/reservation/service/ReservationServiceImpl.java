@@ -12,6 +12,7 @@ import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedExc
 import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.service.domain.ServiceEntity;
 import com.example.reservation.service.repo.ServiceRepository;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.shared.exception.AppException;
 import com.example.reservation.user.domain.UserEntity;
 import com.example.reservation.user.repo.UserRepository;
@@ -45,6 +46,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final AvailabilityService availabilityService;
     private final CancelReservationUseCase cancelReservationUseCase;
     private final ApplicationEventPublisher eventPublisher;
+    private final ReservationMetrics reservationMetrics;
 
     @Override
     @Transactional
@@ -96,6 +98,7 @@ public class ReservationServiceImpl implements ReservationService {
         if (!isSlotAvailable) {
             log.warn("In-transaction availability check failed: slot at {} is no longer free for staff {}",
                     request.startTime(), staff.getId());
+            reservationMetrics.recordBookingConflict(request.businessId(), request.serviceId(), "SLOT_UNAVAILABLE");
             throw new SlotAlreadyBookedException(
                     "Requested slot at " + request.startTime() + " is no longer available"
             );
@@ -122,9 +125,11 @@ public class ReservationServiceImpl implements ReservationService {
         ReservationEntity savedReservation;
         try {
             savedReservation = reservationRepository.saveAndFlush(reservation);
+            reservationMetrics.recordBookingSuccess(business.getId(), service.getId());
         } catch (DataIntegrityViolationException ex) {
             log.warn("Concurrent booking collision detected on DB unique index for staffId={} at startTime={}: {}",
                     staff.getId(), request.startTime(), ex.getMessage());
+            reservationMetrics.recordBookingConflict(request.businessId(), request.serviceId(), "DB_UNIQUE_COLLISION");
             throw new SlotAlreadyBookedException(
                     "The requested slot at " + request.startTime() + " has already been booked by another transaction"
             );

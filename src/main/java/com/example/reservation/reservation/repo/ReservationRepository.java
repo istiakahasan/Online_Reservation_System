@@ -18,6 +18,8 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     List<ReservationEntity> findAllByStaffIdAndStartTimeBetween(UUID staffId, Instant from, Instant to);
     List<ReservationEntity> findAllByStatusAndHoldExpiresAtBefore(ReservationStatus status, Instant now);
 
+    long countByStatusIn(List<ReservationStatus> statuses);
+
     @Query("SELECT r FROM ReservationEntity r WHERE r.status = :status AND (r.holdExpiresAt <= :now OR r.createdAt <= :threshold)")
     List<ReservationEntity> findPendingForExpiration(
             @Param("status") ReservationStatus status,

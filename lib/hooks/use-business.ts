@@ -19,3 +19,4 @@ export function useBusiness(idOrSlug?: string) {
     enabled: Boolean(idOrSlug),
   });
 }
+

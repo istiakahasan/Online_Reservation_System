@@ -1,3 +1,57 @@
 spring:
   application:
     name: Online_Reservation_System
+  threads:
+    virtual:
+      enabled: true
+
+# Logging configuration with MDC correlation fields and OpenTelemetry tracing
+logging:
+  pattern:
+    level: "%5p"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [req=%X{requestId:-none}] [tenant=%X{tenantId:-none}] [user=%X{userId:-anonymous}] [trace=%X{traceId:-0000000000000000},span=%X{spanId:-0000000000000000}] %logger{36} - %msg%n"
+  level:
+    root: INFO
+    com.example.reservation: DEBUG
+    org.springframework.web: INFO
+    io.micrometer: INFO
+
+# Actuator & Observability configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics,prometheus,info"
+      base-path: "/actuator"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState, db, redis, stripe
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        availability_latency: true
+        http.server.requests: true
+      percentiles:
+        availability_latency: 0.5, 0.95, 0.99
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0 # 100% trace sampling across Controller -> Service -> Repository
+    propagation:
+      type: "w3c,b3"
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}

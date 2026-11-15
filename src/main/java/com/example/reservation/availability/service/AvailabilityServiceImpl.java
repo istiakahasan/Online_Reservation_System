@@ -9,6 +9,7 @@ import com.example.reservation.reservation.domain.ReservationStatus;
 import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.service.domain.ServiceEntity;
 import com.example.reservation.service.repo.ServiceRepository;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.shared.exception.AppException;
 import com.example.reservation.staff.domain.StaffTimeOffEntity;
 import com.example.reservation.staff.domain.StaffWorkingHoursEntity;
@@ -33,22 +34,25 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     private final StaffWorkingHoursRepository workingHoursRepository;
     private final StaffTimeOffRepository timeOffRepository;
     private final ReservationRepository reservationRepository;
+    private final ReservationMetrics reservationMetrics;
 
     @Override
     public List<TimeSlotResponseDto> getAvailableSlots(UUID businessId, UUID serviceId, UUID staffId, LocalDate date) {
-        List<AvailableSlot> slots = computeSlots(businessId, serviceId, staffId, date);
+        return reservationMetrics.recordAvailabilityLatency(businessId, () -> {
+            List<AvailableSlot> slots = computeSlots(businessId, serviceId, staffId, date);
 
-        return slots.stream()
-                .map(slot -> new TimeSlotResponseDto(
-                        slot.staffId(),
-                        slot.startInstant(),
-                        slot.endInstant(),
-                        slot.localStartTime(),
-                        slot.localEndTime(),
-                        slot.duration().toMinutes(),
-                        true
-                ))
-                .toList();
+            return slots.stream()
+                    .map(slot -> new TimeSlotResponseDto(
+                            slot.staffId(),
+                            slot.startInstant(),
+                            slot.endInstant(),
+                            slot.localStartTime(),
+                            slot.localEndTime(),
+                            slot.duration().toMinutes(),
+                            true
+                    ))
+                    .toList();
+        });
     }
 
     @Override

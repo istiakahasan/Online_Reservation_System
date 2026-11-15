@@ -12,6 +12,7 @@ import com.example.reservation.staff.domain.StaffTimeOffEntity;
 import com.example.reservation.staff.domain.StaffWorkingHoursEntity;
 import com.example.reservation.staff.repo.StaffTimeOffRepository;
 import com.example.reservation.staff.repo.StaffWorkingHoursRepository;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.user.domain.UserEntity;
 import com.example.reservation.user.domain.UserRole;
 import org.junit.jupiter.api.DisplayName;
@@ -51,6 +52,9 @@ class AvailabilityServiceImplTest {
     @Mock
     private ReservationRepository reservationRepository;
 
+    @Mock
+    private ReservationMetrics reservationMetrics;
+
     @InjectMocks
     private AvailabilityServiceImpl availabilityService;
 
@@ -83,6 +87,10 @@ class AvailabilityServiceImplTest {
         // No reservations
         when(reservationRepository.findAllByStaffIdAndStartTimeBetween(eq(staffId), any(Instant.class), any(Instant.class)))
                 .thenReturn(Collections.emptyList());
+
+        // Mock metrics recording execution
+        when(reservationMetrics.recordAvailabilityLatency(any(), any()))
+                .thenAnswer(invocation -> ((java.util.function.Supplier<?>) invocation.getArgument(1)).get());
 
         // Act
         List<TimeSlotResponseDto> slots = availabilityService.getAvailableSlots(businessId, serviceId, staffId, targetDate);

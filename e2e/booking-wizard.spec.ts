@@ -266,3 +266,4 @@ test.describe("Customer Booking Wizard - 4-Step Happy Path", () => {
     await expect(page.getByTestId("book-another-button")).toBeVisible();
   });
 });
+

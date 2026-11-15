@@ -47,6 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 TenantContextHolder.setTenantId(tenantId);
+                org.slf4j.MDC.put("userId", userId.toString());
+                org.slf4j.MDC.put("tenantId", tenantId.toString());
             }
 
             filterChain.doFilter(request, response);

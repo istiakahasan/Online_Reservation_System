@@ -14,3 +14,4 @@ export function useStaff(businessId?: string) {
     enabled: Boolean(businessId),
   });
 }
+

@@ -83,3 +83,4 @@ export function useAvailability({
     staleTime: 10 * 1000, // Keep slots fresh (10s)
   });
 }
+
