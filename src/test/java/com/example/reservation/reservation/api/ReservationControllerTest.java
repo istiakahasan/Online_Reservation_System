@@ -46,6 +46,9 @@ class ReservationControllerTest {
     @MockBean
     private ReservationService reservationService;
 
+    @MockBean
+    private com.example.reservation.payment.service.StripeService stripeService;
+
     @Test
     @DisplayName("POST /api/reservations - returns 201 Created on successful booking")
     void createReservation_Success_Returns201() throws Exception {
@@ -193,5 +196,29 @@ class ReservationControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.errorCode").value("RESERVATION_INVALID_TRANSITION"));
+    }
+
+    @Test
+    @DisplayName("POST /api/reservations/{id}/payment-intent - returns 200 OK with clientSecret")
+    void createPaymentIntent_Success_Returns200() throws Exception {
+        UUID reservationId = UUID.randomUUID();
+        com.example.reservation.payment.api.dto.PaymentIntentResponseDto responseDto =
+                new com.example.reservation.payment.api.dto.PaymentIntentResponseDto(
+                        "pi_test_secret_123",
+                        "pi_test_123",
+                        new BigDecimal("95.00"),
+                        "USD",
+                        reservationId
+                );
+
+        when(stripeService.createPaymentIntent(eq(reservationId))).thenReturn(responseDto);
+
+        mockMvc.perform(post("/api/reservations/{id}/payment-intent", reservationId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.clientSecret").value("pi_test_secret_123"))
+                .andExpect(jsonPath("$.paymentIntentId").value("pi_test_123"))
+                .andExpect(jsonPath("$.amount").value(95.00))
+                .andExpect(jsonPath("$.currency").value("USD"))
+                .andExpect(jsonPath("$.reservationId").value(reservationId.toString()));
     }
 }

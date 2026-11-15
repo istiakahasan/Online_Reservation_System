@@ -166,3 +166,4 @@ class ReservationScheduledJobsTest {
         assertThat(noShowEvent.reservationId()).isEqualTo(confirmed.getId());
     }
 }
+
