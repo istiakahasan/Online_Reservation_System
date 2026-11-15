@@ -1,7 +1,7 @@
 package com.example.reservation.user.domain;
 
 import com.example.reservation.business.domain.BusinessEntity;
-import com.example.reservation.common.domain.BaseAuditableEntity;
+import com.example.reservation.shared.domain.BaseAuditableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
