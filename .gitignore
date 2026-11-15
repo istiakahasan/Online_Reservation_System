@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Next.js & Node ###
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+.env*.local
