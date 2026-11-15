@@ -3,7 +3,6 @@
 -- Description: Core schema for Multi-Tenant Online Reservation System
 -- =============================================================================
 
--- Enable pgcrypto / uuid-ossp for UUID generation
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- =============================================================================
@@ -33,6 +32,7 @@ CREATE TABLE users (
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
     role VARCHAR(50) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'ACTIVE',
@@ -47,7 +47,25 @@ CREATE TABLE users (
 );
 
 -- =============================================================================
--- 3. Table: services (Bookable Offerings)
+-- 3. Table: refresh_tokens (Authentication Sessions)
+-- =============================================================================
+CREATE TABLE refresh_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    token VARCHAR(512) NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    revoked BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    created_by VARCHAR(255) NOT NULL DEFAULT 'SYSTEM',
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (user_id)
+        REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT uq_refresh_tokens_token UNIQUE (token)
+);
+
+-- =============================================================================
+-- 4. Table: services (Bookable Offerings)
 -- =============================================================================
 CREATE TABLE services (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -69,7 +87,7 @@ CREATE TABLE services (
 );
 
 -- =============================================================================
--- 4. Table: reservations (Booking Transactions)
+-- 5. Table: reservations (Booking Transactions)
 -- =============================================================================
 CREATE TABLE reservations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -104,7 +122,7 @@ CREATE TABLE reservations (
 );
 
 -- =============================================================================
--- 5. Indexes & Performance Optimization
+-- 6. Indexes & Performance Optimization
 -- =============================================================================
 
 -- Businesses
@@ -113,6 +131,10 @@ CREATE UNIQUE INDEX idx_businesses_slug ON businesses (slug);
 -- Users
 CREATE INDEX idx_users_business_id ON users (business_id);
 CREATE INDEX idx_users_business_role ON users (business_id, role);
+
+-- Refresh Tokens
+CREATE INDEX idx_refresh_tokens_token ON refresh_tokens (token);
+CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens (user_id);
 
 -- Services
 CREATE INDEX idx_services_business_active ON services (business_id, is_active);
@@ -127,12 +149,7 @@ CREATE INDEX idx_reservations_business_status ON reservations (business_id, stat
 CREATE INDEX idx_reservations_pending_expiration ON reservations (hold_expires_at) 
     WHERE status = 'PENDING';
 
--- =============================================================================
--- 6. Partial Unique Index: Double-Booking Prevention
--- =============================================================================
--- Prevents overlapping active bookings for the same staff member at the same start time.
--- CANCELLED, COMPLETED, or NO_SHOW records are excluded to allow re-booking of freed slots.
+-- Partial Unique Index: Double-Booking Prevention
 CREATE UNIQUE INDEX uq_reservations_staff_active_slot 
     ON reservations (staff_id, start_time) 
     WHERE status IN ('PENDING', 'CONFIRMED');
-

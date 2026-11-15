@@ -5,8 +5,8 @@ import com.example.reservation.auth.api.dto.LoginRequestDto;
 import com.example.reservation.auth.api.dto.RegisterRequestDto;
 
 public interface AuthService {
-    AuthResponseDto login(LoginRequestDto request);
     AuthResponseDto register(RegisterRequestDto request);
-    AuthResponseDto refreshToken(String refreshToken);
+    AuthResponseDto login(LoginRequestDto request);
+    AuthResponseDto refresh(String refreshToken);
+    void logout(String refreshToken);
 }
-

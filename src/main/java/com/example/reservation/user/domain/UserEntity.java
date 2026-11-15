@@ -46,6 +46,9 @@ public class UserEntity extends BaseAuditableEntity {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash;
+
     @Column(name = "phone", length = 50)
     private String phone;
 
@@ -57,11 +60,12 @@ public class UserEntity extends BaseAuditableEntity {
     @Column(name = "status", nullable = false, length = 50)
     private UserStatus status = UserStatus.ACTIVE;
 
-    public UserEntity(BusinessEntity business, String firstName, String lastName, String email, String phone, UserRole role) {
+    public UserEntity(BusinessEntity business, String firstName, String lastName, String email, String passwordHash, String phone, UserRole role) {
         this.business = business;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.passwordHash = passwordHash;
         this.phone = phone;
         this.role = role;
         this.status = UserStatus.ACTIVE;
@@ -80,4 +84,3 @@ public class UserEntity extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
-
