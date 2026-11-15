@@ -28,8 +28,7 @@ public class ReservationStateMachine {
             ReservationStatus.CONFIRMED, EnumSet.of(UserRole.STAFF, UserRole.ADMIN),
             ReservationStatus.CANCELLED, EnumSet.of(UserRole.CUSTOMER, UserRole.STAFF, UserRole.ADMIN),
             ReservationStatus.COMPLETED, EnumSet.of(UserRole.STAFF, UserRole.ADMIN),
-            ReservationStatus.NO_SHOW, EnumSet.of(UserRole.STAFF, UserRole.ADMIN)
-    );
+            ReservationStatus.NO_SHOW, EnumSet.of(UserRole.STAFF, UserRole.ADMIN));
 
     private final UUID reservationId;
     private final UUID businessId;
@@ -46,8 +45,7 @@ public class ReservationStateMachine {
         return new ReservationStateMachine(
                 reservation.getId(),
                 reservation.getBusiness().getId(),
-                reservation.getStatus()
-        );
+                reservation.getStatus());
     }
 
     /**
@@ -87,10 +85,12 @@ public class ReservationStateMachine {
     }
 
     /**
-     * Generic transition dispatcher. Validates transition and role, mutates current state,
+     * Generic transition dispatcher. Validates transition and role, mutates current
+     * state,
      * and returns the corresponding domain event.
      */
-    public ReservationDomainEvent transitionTo(ReservationStatus targetStatus, UUID actorId, UserRole actorRole, String reason) {
+    public ReservationDomainEvent transitionTo(ReservationStatus targetStatus, UUID actorId, UserRole actorRole,
+            String reason) {
         return switch (targetStatus) {
             case CONFIRMED -> confirm(actorId, actorRole);
             case CANCELLED -> cancel(actorId, actorRole, reason);

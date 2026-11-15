@@ -24,3 +24,4 @@ public sealed interface ReservationDomainEvent permits
 
     UserRole actorRole();
 }
+

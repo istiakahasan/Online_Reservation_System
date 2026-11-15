@@ -52,7 +52,8 @@ public enum ReservationStatus {
     }
 
     /**
-     * Returns true if this is a terminal status from which no further transitions are possible.
+     * Returns true if this is a terminal status from which no further transitions
+     * are possible.
      */
     public boolean isTerminal() {
         return nextAllowedStatuses().isEmpty();
