@@ -55,3 +55,4 @@ This document outlines the test strategy, test categories, and executable test f
 
 - [x] `load-tests/gatling/ReservationBookingSimulation.java` — Gatling Java DSL simulation asserting sub-1500ms p95 response time and zero 5xx server errors when 100 concurrent users simultaneously query availability and compete to book a slot.
 - [x] `load-tests/jmeter/reservation_100_concurrent_bookings.jmx` — Apache JMeter test plan configuring a 100-thread synchronized burst with dynamic UUIDs verifying availability lookups and HTTP 201/409 assertion boundaries.
+
