@@ -99,3 +99,4 @@ public class HealthCheckController {
         return ResponseEntity.status(isAllReady ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE).body(response);
     }
 }
+
