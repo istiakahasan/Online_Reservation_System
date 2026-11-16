@@ -1,15 +1,18 @@
 package com.example.reservation.shared.exception;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Slf4j
 @RestControllerAdvice
@@ -37,6 +40,26 @@ public class GlobalExceptionHandler {
                 "Request validation failed",
                 errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler({
+        MethodArgumentTypeMismatchException.class,
+        MissingServletRequestParameterException.class,
+        HttpMessageNotReadableException.class,
+        IllegalArgumentException.class
+    })
+    public ResponseEntity<ErrorResponseDto> handleBadRequest(Exception ex) {
+        log.warn("Invalid request: {}", ex.getMessage());
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST", "Malformed or invalid request parameter");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponseDto> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.METHOD_NOT_ALLOWED.value(), "METHOD_NOT_ALLOWED", "HTTP method not supported");
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(error);
     }
 
     @ExceptionHandler(Exception.class)

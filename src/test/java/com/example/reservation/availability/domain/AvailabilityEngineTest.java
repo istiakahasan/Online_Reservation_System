@@ -1,14 +1,13 @@
 package com.example.reservation.availability.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class AvailabilityEngineTest {
 

@@ -2,7 +2,6 @@ package com.example.reservation.payment.service;
 
 import com.example.reservation.payment.api.dto.CreatePaymentRequestDto;
 import com.example.reservation.payment.api.dto.PaymentResponseDto;
-
 import java.util.UUID;
 
 public interface PaymentService {

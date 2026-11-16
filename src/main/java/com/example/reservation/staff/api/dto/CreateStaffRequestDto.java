@@ -3,7 +3,6 @@ package com.example.reservation.staff.api.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.UUID;
 
 @Schema(description = "Create or link staff member profile")
@@ -23,4 +22,3 @@ public record CreateStaffRequestDto(
         @Schema(description = "Staff bio / specialization")
         String bio
 ) {}
-

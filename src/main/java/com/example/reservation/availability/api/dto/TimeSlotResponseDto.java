@@ -1,7 +1,6 @@
 package com.example.reservation.availability.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.UUID;

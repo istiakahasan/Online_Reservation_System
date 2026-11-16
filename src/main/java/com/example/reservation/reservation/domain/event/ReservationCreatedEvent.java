@@ -17,4 +17,3 @@ public record ReservationCreatedEvent(
         Instant holdExpiresAt,
         Instant occurredAt
 ) {}
-

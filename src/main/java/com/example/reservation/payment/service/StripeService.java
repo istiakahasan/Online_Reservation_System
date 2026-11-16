@@ -1,7 +1,6 @@
 package com.example.reservation.payment.service;
 
 import com.example.reservation.payment.api.dto.PaymentIntentResponseDto;
-
 import java.util.UUID;
 
 public interface StripeService {
@@ -22,4 +21,3 @@ public interface StripeService {
      */
     void processWebhookEvent(String payload, String sigHeader);
 }
-

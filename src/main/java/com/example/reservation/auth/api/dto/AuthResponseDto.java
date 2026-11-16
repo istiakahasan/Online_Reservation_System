@@ -1,7 +1,6 @@
 package com.example.reservation.auth.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.UUID;
 
 @Schema(description = "Authentication response with JWT token pair")
@@ -31,4 +30,3 @@ public record AuthResponseDto(
         return new AuthResponseDto(accessToken, refreshToken, "Bearer", expiresIn, userId, businessId, role);
     }
 }
-

@@ -1,7 +1,6 @@
 package com.example.reservation.shared.exception;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.Instant;
 import java.util.Map;
 
@@ -30,4 +29,3 @@ public record ErrorResponseDto(
         this(status, errorCode, message, Instant.now(), details);
     }
 }
-

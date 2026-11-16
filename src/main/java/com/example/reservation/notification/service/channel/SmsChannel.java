@@ -2,11 +2,10 @@ package com.example.reservation.notification.service.channel;
 
 import com.example.reservation.notification.domain.NotificationLogEntity;
 import com.example.reservation.notification.repo.NotificationLogRepository;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
 
 @Slf4j
 @Component

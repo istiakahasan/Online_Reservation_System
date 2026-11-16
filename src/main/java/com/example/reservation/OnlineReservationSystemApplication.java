@@ -10,4 +10,3 @@ public class OnlineReservationSystemApplication {
         SpringApplication.run(OnlineReservationSystemApplication.class, args);
     }
 }
-

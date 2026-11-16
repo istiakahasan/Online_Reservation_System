@@ -11,4 +11,3 @@ public record ReservationReminderEvent(
         Instant startTime,
         Instant occurredAt
 ) {}
-

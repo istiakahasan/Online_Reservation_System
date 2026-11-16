@@ -1,38 +1,34 @@
 package com.example.reservation.availability.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import com.example.reservation.availability.api.dto.TimeSlotResponseDto;
 import com.example.reservation.business.domain.BusinessEntity;
 import com.example.reservation.business.repo.BusinessRepository;
-import com.example.reservation.reservation.domain.ReservationEntity;
-import com.example.reservation.reservation.domain.ReservationStatus;
 import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.service.domain.ServiceEntity;
 import com.example.reservation.service.repo.ServiceRepository;
-import com.example.reservation.staff.domain.StaffTimeOffEntity;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.staff.domain.StaffWorkingHoursEntity;
 import com.example.reservation.staff.repo.StaffTimeOffRepository;
 import com.example.reservation.staff.repo.StaffWorkingHoursRepository;
-import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.user.domain.UserEntity;
 import com.example.reservation.user.domain.UserRole;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class AvailabilityServiceImplTest {

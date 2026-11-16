@@ -1,5 +1,10 @@
 package com.example.reservation.reservation.jobs;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
 import com.example.reservation.business.domain.BusinessEntity;
 import com.example.reservation.reservation.domain.ReservationEntity;
 import com.example.reservation.reservation.domain.ReservationStatus;
@@ -10,6 +15,11 @@ import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.service.domain.ServiceEntity;
 import com.example.reservation.user.domain.UserEntity;
 import com.example.reservation.user.domain.UserRole;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,17 +29,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationScheduledJobsTest {
@@ -166,4 +165,3 @@ class ReservationScheduledJobsTest {
         assertThat(noShowEvent.reservationId()).isEqualTo(confirmed.getId());
     }
 }
-

@@ -1,5 +1,8 @@
 package com.example.reservation.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.example.reservation.auth.service.JwtService;
 import com.example.reservation.service.service.ServiceService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,14 +12,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @WebMvcTest(ServiceController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class ServiceControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private JwtService jwtService;
 
     @MockBean
     private ServiceService serviceService;
@@ -28,4 +32,3 @@ class ServiceControllerTest {
         assertThat(serviceService).isNotNull();
     }
 }
-

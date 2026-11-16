@@ -7,15 +7,14 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * Centralized Micrometer Metrics Publisher for Reservation and Payment domain operations.
@@ -149,4 +148,3 @@ public class ReservationMetrics {
         }
     }
 }
-

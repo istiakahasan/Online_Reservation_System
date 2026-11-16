@@ -1,10 +1,9 @@
 package com.example.reservation.reservation.domain.exception;
 
 import com.example.reservation.shared.exception.AppException;
-import org.springframework.http.HttpStatus;
-
 import java.time.Duration;
 import java.time.Instant;
+import org.springframework.http.HttpStatus;
 
 public class CancellationWindowExpiredException extends AppException {
 
@@ -21,4 +20,3 @@ public class CancellationWindowExpiredException extends AppException {
         super(message, "CANCELLATION_WINDOW_EXPIRED", HttpStatus.CONFLICT);
     }
 }
-

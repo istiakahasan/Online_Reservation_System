@@ -1,6 +1,5 @@
 package com.example.reservation.reservation.service;
 
-import com.example.reservation.business.repo.BusinessRepository;
 import com.example.reservation.payment.domain.PaymentEntity;
 import com.example.reservation.payment.repo.PaymentRepository;
 import com.example.reservation.payment.service.StripeRefundResult;
@@ -16,6 +15,11 @@ import com.example.reservation.reservation.domain.policy.RefundPolicyRegistry;
 import com.example.reservation.reservation.domain.policy.RefundPolicyType;
 import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.shared.exception.AppException;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,12 +27,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -163,4 +161,3 @@ public class CancelReservationUseCase {
             RefundDecision refundDecision
     ) {}
 }
-

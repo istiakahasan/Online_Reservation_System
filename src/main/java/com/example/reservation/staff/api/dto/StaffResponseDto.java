@@ -1,7 +1,6 @@
 package com.example.reservation.staff.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.UUID;
 
 @Schema(description = "Staff profile details")
@@ -27,4 +26,3 @@ public record StaffResponseDto(
         @Schema(description = "Active status flag")
         Boolean isActive
 ) {}
-

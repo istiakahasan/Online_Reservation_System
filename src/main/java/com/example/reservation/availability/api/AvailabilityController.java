@@ -3,9 +3,11 @@ package com.example.reservation.availability.api;
 import com.example.reservation.availability.api.dto.TimeSlotResponseDto;
 import com.example.reservation.availability.service.AvailabilityService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping({"/api/businesses/{businessId}/availability", "/api/v1/businesses/{businessId}/availability"})

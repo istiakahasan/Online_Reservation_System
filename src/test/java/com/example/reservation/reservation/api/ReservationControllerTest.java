@@ -1,5 +1,14 @@
 package com.example.reservation.reservation.api;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.example.reservation.auth.service.JwtService;
 import com.example.reservation.reservation.api.dto.CreateReservationRequestDto;
 import com.example.reservation.reservation.api.dto.ReservationResponseDto;
 import com.example.reservation.reservation.domain.ReservationStatus;
@@ -9,6 +18,10 @@ import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedExc
 import com.example.reservation.reservation.service.ReservationService;
 import com.example.reservation.shared.exception.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +31,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReservationController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -42,6 +42,9 @@ class ReservationControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private JwtService jwtService;
 
     @MockBean
     private ReservationService reservationService;

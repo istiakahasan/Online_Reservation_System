@@ -1,0 +1,129 @@
+services:
+  # ----------------------------------------------------------------------------
+  # PostgreSQL 16 Database
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: reservation-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-reservation_db}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-reservation_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - reservation-network
+
+  # ----------------------------------------------------------------------------
+  # Redis 7 In-Memory Cache & Distributed Lock Storage
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: reservation-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - reservation-network
+
+  # ----------------------------------------------------------------------------
+  # MailHog SMTP Server & Testing Web Mailbox
+  # ----------------------------------------------------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: reservation-mailhog
+    restart: unless-stopped
+    ports:
+      - "${MAIL_PORT:-1025}:1025" # SMTP Port
+      - "8025:8025"              # Web UI for previewing notification emails
+    networks:
+      - reservation-network
+
+  # ----------------------------------------------------------------------------
+  # Stripe Mock Server for Local & Staging Payment Intent Testing
+  # ----------------------------------------------------------------------------
+  stripe-mock:
+    image: stripe/stripe-mock:latest
+    container_name: reservation-stripe-mock
+    restart: unless-stopped
+    ports:
+      - "12111:12111" # HTTP API
+      - "12112:12112" # HTTPS API
+    networks:
+      - reservation-network
+
+  # ----------------------------------------------------------------------------
+  # Spring Boot Application (Online Reservation System)
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: reservation-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+      stripe-mock:
+        condition: service_started
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-reservation_db}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-postgres}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      APPLICATION_REDISSON_ADDRESS: redis://redis:6379
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
+      APPLICATION_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-signing-key-that-is-at-least-256-bits-long-change-me!}
+      APPLICATION_JWT_ACCESS_EXPIRATION_MINUTES: ${JWT_ACCESS_EXPIRATION_MINUTES:-15}
+      APPLICATION_JWT_REFRESH_EXPIRATION_DAYS: ${JWT_REFRESH_EXPIRATION_DAYS:-7}
+      STRIPE_API_KEY: ${STRIPE_API_KEY:-sk_test_mock_key_for_local_development}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_mock_test_secret_for_local_testing}
+      STRIPE_BASE_URL: http://stripe-mock:12111
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,metrics,prometheus,info
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318/v1/traces}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 35s
+    networks:
+      - reservation-network
+
+networks:
+  reservation-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+

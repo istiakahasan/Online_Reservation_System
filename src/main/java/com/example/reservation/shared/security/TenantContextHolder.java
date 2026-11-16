@@ -1,8 +1,7 @@
 package com.example.reservation.shared.security;
 
-import org.slf4j.MDC;
-
 import java.util.UUID;
+import org.slf4j.MDC;
 
 public final class TenantContextHolder {
 

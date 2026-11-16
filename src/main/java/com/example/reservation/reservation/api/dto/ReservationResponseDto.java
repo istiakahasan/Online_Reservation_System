@@ -1,7 +1,6 @@
 package com.example.reservation.reservation.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -44,4 +43,3 @@ public record ReservationResponseDto(
         @Schema(description = "Booking notes")
         String notes
 ) {}
-

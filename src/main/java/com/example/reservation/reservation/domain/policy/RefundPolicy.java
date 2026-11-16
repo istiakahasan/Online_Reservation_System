@@ -1,7 +1,6 @@
 package com.example.reservation.reservation.domain.policy;
 
 import com.example.reservation.reservation.domain.ReservationEntity;
-
 import java.math.BigDecimal;
 
 public interface RefundPolicy {
@@ -10,4 +9,3 @@ public interface RefundPolicy {
 
     RefundDecision calculateRefund(ReservationEntity reservation, BigDecimal amountPaid);
 }
-

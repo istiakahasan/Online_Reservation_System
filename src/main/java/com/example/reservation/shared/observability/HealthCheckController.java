@@ -3,11 +3,14 @@ package com.example.reservation.shared.observability;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthComponent;
-import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,12 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Controller exposing lightweight /health (liveness) and /ready (readiness)
@@ -99,4 +96,3 @@ public class HealthCheckController {
         return ResponseEntity.status(isAllReady ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE).body(response);
     }
 }
-

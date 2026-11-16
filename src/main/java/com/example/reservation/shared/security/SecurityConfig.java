@@ -2,7 +2,8 @@ package com.example.reservation.shared.security;
 
 import com.example.reservation.shared.observability.MdcLoggingFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
+import java.time.Instant;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.time.Instant;
-import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
