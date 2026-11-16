@@ -1,6 +1,6 @@
-# CLAUDE.md — Agent Guidelines & Project Standards
+# Project Standards — Agent Guidelines & Architecture Rules
 
-This document defines the strict engineering guidelines, architectural rules, and coding standards that Claude (and all AI assistants) must strictly follow in every session when contributing to the **Online Reservation System**.
+This document defines the strict engineering guidelines, architectural rules, and coding standards that all developers and AI assistants must strictly follow in every session when contributing to the **Online Reservation System**.
 
 ---
 
