@@ -38,8 +38,7 @@ jobs:
 
       - name: Verify Code Formatting (Spotless)
         run: |
-          chmod +x mvnw
-          ./mvnw spotless:check -B
+          mvn spotless:check -B
 
   # ============================================================================
   # 2. Test Job (Unit & Testcontainers Integration Tests)
@@ -61,8 +60,7 @@ jobs:
 
       - name: Execute Tests (with Testcontainers PostgreSQL & Redis)
         run: |
-          chmod +x mvnw
-          ./mvnw clean test -B
+          mvn clean test -B
         env:
           TESTCONTAINERS_RYUK_DISABLED: "false"
 
@@ -94,8 +92,7 @@ jobs:
 
       - name: Build Layered Spring Boot JAR
         run: |
-          chmod +x mvnw
-          ./mvnw clean package -DskipTests -B
+          mvn clean package -DskipTests -B
 
       - name: Upload Packaged JAR
         uses: actions/upload-artifact@v4
@@ -182,8 +179,7 @@ jobs:
 
       - name: Run Flyway Migrations
         run: |
-          chmod +x mvnw
-          ./mvnw flyway:migrate -B -Dflyway.url="$DATABASE_URL" -Dflyway.user="$DB_USERNAME" -Dflyway.password="$DB_PASSWORD"
+          mvn flyway:migrate -B -Dflyway.url="$DATABASE_URL" -Dflyway.user="$DB_USERNAME" -Dflyway.password="$DB_PASSWORD"
         env:
           DATABASE_URL: ${{ secrets.PROD_DATABASE_URL || 'jdbc:postgresql://localhost:5432/reservation_db' }}
           DB_USERNAME: ${{ secrets.PROD_DB_USERNAME || 'postgres' }}

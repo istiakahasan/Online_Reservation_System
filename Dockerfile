@@ -1,24 +1,23 @@
 # ==============================================================================
 # Stage 1: Build stage (JDK 21)
 # ==============================================================================
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 WORKDIR /build
 
 # Install bash and utility tools
 RUN apk add --no-cache bash
 
-# Copy Maven wrapper configuration and descriptor for dependency caching
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
+# Copy project descriptor for dependency caching
+COPY pom.xml ./
 
 # Pre-fetch project dependencies in a separate layer to leverage Docker layer cache
-RUN chmod +x ./mvnw && ./mvnw dependency:go-offline -B || true
+RUN mvn dependency:go-offline -B || true
 
 # Copy project source code
 COPY src/ ./src/
 
 # Package production application artifact
-RUN ./mvnw clean package -DskipTests -B
+RUN mvn clean package -DskipTests -B
 
 # Extract layered jar layers for fine-grained container image caching
 RUN mkdir -p /build/extracted && \
