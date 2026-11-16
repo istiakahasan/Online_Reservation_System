@@ -2,6 +2,7 @@ package com.example.reservation.notification.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.reservation.auth.service.JwtService;
 import com.example.reservation.notification.service.NotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,9 @@ class NotificationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private JwtService jwtService;
 
     @MockBean
     private NotificationService notificationService;

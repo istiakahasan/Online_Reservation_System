@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.reservation.auth.service.JwtService;
 import com.example.reservation.reservation.api.dto.CreateReservationRequestDto;
 import com.example.reservation.reservation.api.dto.ReservationResponseDto;
 import com.example.reservation.reservation.domain.ReservationStatus;
@@ -41,6 +42,9 @@ class ReservationControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private JwtService jwtService;
 
     @MockBean
     private ReservationService reservationService;

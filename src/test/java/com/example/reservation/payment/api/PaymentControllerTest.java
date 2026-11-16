@@ -2,6 +2,7 @@ package com.example.reservation.payment.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.reservation.auth.service.JwtService;
 import com.example.reservation.payment.service.PaymentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,9 @@ class PaymentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private JwtService jwtService;
 
     @MockBean
     private PaymentService paymentService;

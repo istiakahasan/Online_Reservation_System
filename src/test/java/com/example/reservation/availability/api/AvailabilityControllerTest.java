@@ -2,6 +2,7 @@ package com.example.reservation.availability.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.reservation.auth.service.JwtService;
 import com.example.reservation.availability.service.AvailabilityService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,9 @@ class AvailabilityControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private JwtService jwtService;
 
     @MockBean
     private AvailabilityService availabilityService;

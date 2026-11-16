@@ -22,7 +22,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
-import com.stripe.net.EventGSON;
+import com.stripe.net.ApiResource;
 import com.stripe.net.Webhook;
 import com.stripe.param.PaymentIntentCreateParams;
 import java.math.BigDecimal;
@@ -169,7 +169,7 @@ public class StripeServiceImpl implements StripeService {
         Event event;
         if (webhookSecret == null || webhookSecret.isBlank() || webhookSecret.startsWith("mock")) {
             try {
-                event = EventGSON.getInstance().fromJson(payload, Event.class);
+                event = ApiResource.GSON.fromJson(payload, Event.class);
                 if (event == null || event.getId() == null) {
                     throw new InvalidWebhookSignatureException("Malformed event JSON payload");
                 }
@@ -306,10 +306,10 @@ public class StripeServiceImpl implements StripeService {
         }
 
         if (deserializer.getRawJson() != null) {
-            return EventGSON.getInstance().fromJson(deserializer.getRawJson(), PaymentIntent.class);
+            return ApiResource.GSON.fromJson(deserializer.getRawJson(), PaymentIntent.class);
         }
 
         // Fallback: parse from raw event data object
-        return EventGSON.getInstance().fromJson(rawPayload, PaymentIntent.class);
+        return ApiResource.GSON.fromJson(rawPayload, PaymentIntent.class);
     }
 }

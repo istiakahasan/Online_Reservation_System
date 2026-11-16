@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.reservation.auth.service.JwtService;
 import com.example.reservation.payment.domain.exception.InvalidWebhookSignatureException;
 import com.example.reservation.payment.service.StripeService;
 import com.example.reservation.shared.exception.GlobalExceptionHandler;
@@ -28,6 +29,9 @@ class StripeWebhookControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private JwtService jwtService;
 
     @MockBean
     private StripeService stripeService;
