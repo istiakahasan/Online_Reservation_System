@@ -127,3 +127,4 @@ class MdcLoggingFilterTest {
         assertThat(capturedUser.get()).isEqualTo("anonymous");
     }
 }
+

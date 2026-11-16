@@ -98,3 +98,4 @@ class HealthCheckControllerTest {
         assertThat(response.getBody().get("status")).isEqualTo("DOWN");
     }
 }
+

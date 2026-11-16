@@ -48,3 +48,4 @@ public class StripeHealthIndicator implements HealthIndicator {
         }
     }
 }
+

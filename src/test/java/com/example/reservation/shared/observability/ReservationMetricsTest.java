@@ -118,3 +118,4 @@ class ReservationMetricsTest {
         assertThat(gauge.value()).isEqualTo(42.0);
     }
 }
+

@@ -37,68 +37,76 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AvailabilityServiceImplTest {
 
-    @Mock
-    private BusinessRepository businessRepository;
+        @Mock
+        private BusinessRepository businessRepository;
 
-    @Mock
-    private ServiceRepository serviceRepository;
+        @Mock
+        private ServiceRepository serviceRepository;
 
-    @Mock
-    private StaffWorkingHoursRepository workingHoursRepository;
+        @Mock
+        private StaffWorkingHoursRepository workingHoursRepository;
 
-    @Mock
-    private StaffTimeOffRepository timeOffRepository;
+        @Mock
+        private StaffTimeOffRepository timeOffRepository;
 
-    @Mock
-    private ReservationRepository reservationRepository;
+        @Mock
+        private ReservationRepository reservationRepository;
 
-    @Mock
-    private ReservationMetrics reservationMetrics;
+        @Mock
+        private ReservationMetrics reservationMetrics;
 
-    @InjectMocks
-    private AvailabilityServiceImpl availabilityService;
+        @InjectMocks
+        private AvailabilityServiceImpl availabilityService;
 
-    private final UUID businessId = UUID.randomUUID();
-    private final UUID serviceId = UUID.randomUUID();
-    private final UUID staffId = UUID.randomUUID();
-    private final LocalDate targetDate = LocalDate.now().plusDays(3); // In future to ensure not past
+        private final UUID businessId = UUID.randomUUID();
+        private final UUID serviceId = UUID.randomUUID();
+        private final UUID staffId = UUID.randomUUID();
+        private final LocalDate targetDate = LocalDate.now().plusDays(3); // In future to ensure not past
 
-    @Test
-    @DisplayName("AvailabilityService coordinates repositories and returns computed slots")
-    void shouldCoordinateRepositoriesAndReturnSlots() {
-        // Arrange Business
-        BusinessEntity business = new BusinessEntity("Bistro", "bistro", "Europe/Paris", "b@example.com", "+123");
-        when(businessRepository.findById(businessId)).thenReturn(Optional.of(business));
+        @Test
+        @DisplayName("AvailabilityService coordinates repositories and returns computed slots")
+        void shouldCoordinateRepositoriesAndReturnSlots() {
+                // Arrange Business
+                BusinessEntity business = new BusinessEntity("Bistro", "bistro", "Europe/Paris", "b@example.com",
+                                "+123");
+                when(businessRepository.findById(businessId)).thenReturn(Optional.of(business));
 
-        // Arrange Service: 45m duration + 15m buffer
-        ServiceEntity service = new ServiceEntity(business, "Haircut", "Desc", 45, 15, new BigDecimal("50.00"), "EUR");
-        when(serviceRepository.findById(serviceId)).thenReturn(Optional.of(service));
+                // Arrange Service: 45m duration + 15m buffer
+                ServiceEntity service = new ServiceEntity(business, "Haircut", "Desc", 45, 15, new BigDecimal("50.00"),
+                                "EUR");
+                when(serviceRepository.findById(serviceId)).thenReturn(Optional.of(service));
 
-        // Arrange Staff & Working Hours (9:00 - 11:00 on this day)
-        UserEntity staffUser = new UserEntity(business, "Jean", "Dupont", "jean@example.com", "hash", "+123", UserRole.STAFF);
-        StaffWorkingHoursEntity hours = new StaffWorkingHoursEntity(business, staffUser, targetDate.getDayOfWeek(), LocalTime.of(9, 0), LocalTime.of(11, 0));
-        when(workingHoursRepository.findAllByStaffIdAndDayOfWeek(staffId, targetDate.getDayOfWeek()))
-                .thenReturn(List.of(hours));
+                // Arrange Staff & Working Hours (9:00 - 11:00 on this day)
+                UserEntity staffUser = new UserEntity(business, "Jean", "Dupont", "jean@example.com", "hash", "+123",
+                                UserRole.STAFF);
+                StaffWorkingHoursEntity hours = new StaffWorkingHoursEntity(business, staffUser,
+                                targetDate.getDayOfWeek(), LocalTime.of(9, 0), LocalTime.of(11, 0));
+                when(workingHoursRepository.findAllByStaffIdAndDayOfWeek(staffId, targetDate.getDayOfWeek()))
+                                .thenReturn(List.of(hours));
 
-        // No time-offs
-        when(timeOffRepository.findOverlappingTimeOff(eq(staffId), any(Instant.class), any(Instant.class)))
-                .thenReturn(Collections.emptyList());
+                // No time-offs
+                when(timeOffRepository.findOverlappingTimeOff(eq(staffId), any(Instant.class), any(Instant.class)))
+                                .thenReturn(Collections.emptyList());
 
-        // No reservations
-        when(reservationRepository.findAllByStaffIdAndStartTimeBetween(eq(staffId), any(Instant.class), any(Instant.class)))
-                .thenReturn(Collections.emptyList());
+                // No reservations
+                when(reservationRepository.findAllByStaffIdAndStartTimeBetween(eq(staffId), any(Instant.class),
+                                any(Instant.class)))
+                                .thenReturn(Collections.emptyList());
 
-        // Mock metrics recording execution
-        when(reservationMetrics.recordAvailabilityLatency(any(), any()))
-                .thenAnswer(invocation -> ((java.util.function.Supplier<?>) invocation.getArgument(1)).get());
+                // Mock metrics recording execution
+                when(reservationMetrics.recordAvailabilityLatency(any(), any()))
+                                .thenAnswer(invocation -> ((java.util.function.Supplier<?>) invocation.getArgument(1))
+                                                .get());
 
-        // Act
-        List<TimeSlotResponseDto> slots = availabilityService.getAvailableSlots(businessId, serviceId, staffId, targetDate);
+                // Act
+                List<TimeSlotResponseDto> slots = availabilityService.getAvailableSlots(businessId, serviceId, staffId,
+                                targetDate);
 
-        // Assert: 9:00 to 11:00 (120m). 45m + 15m buffer = 60m per slot. Fits exactly 2 slots: 09:00 and 10:00.
-        assertThat(slots).hasSize(2);
-        assertThat(slots.get(0).durationMinutes()).isEqualTo(45);
-        assertThat(slots.get(0).localStartTime().toLocalTime()).isEqualTo(LocalTime.of(9, 0));
-        assertThat(slots.get(1).localStartTime().toLocalTime()).isEqualTo(LocalTime.of(10, 0));
-    }
+                // Assert: 9:00 to 11:00 (120m). 45m + 15m buffer = 60m per slot. Fits exactly 2
+                // slots: 09:00 and 10:00.
+                assertThat(slots).hasSize(2);
+                assertThat(slots.get(0).durationMinutes()).isEqualTo(45);
+                assertThat(slots.get(0).localStartTime().toLocalTime()).isEqualTo(LocalTime.of(9, 0));
+                assertThat(slots.get(1).localStartTime().toLocalTime()).isEqualTo(LocalTime.of(10, 0));
+        }
 }
