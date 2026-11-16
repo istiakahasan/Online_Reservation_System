@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: Online_Reservation_System_Test
+  threads:
+    virtual:
+      enabled: true
+
+management:
+  tracing:
+    enabled: false
+  otlp:
+    tracing:
+      endpoint: ""
+
