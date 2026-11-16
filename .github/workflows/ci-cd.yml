@@ -37,7 +37,9 @@ jobs:
           cache: 'maven'
 
       - name: Verify Code Formatting (Spotless)
-        run: ./mvnw spotless:check -B
+        run: |
+          chmod +x mvnw
+          ./mvnw spotless:check -B
 
   # ============================================================================
   # 2. Test Job (Unit & Testcontainers Integration Tests)
@@ -58,7 +60,9 @@ jobs:
           cache: 'maven'
 
       - name: Execute Tests (with Testcontainers PostgreSQL & Redis)
-        run: ./mvnw clean test -B
+        run: |
+          chmod +x mvnw
+          ./mvnw clean test -B
         env:
           TESTCONTAINERS_RYUK_DISABLED: "false"
 
@@ -89,7 +93,9 @@ jobs:
           cache: 'maven'
 
       - name: Build Layered Spring Boot JAR
-        run: ./mvnw clean package -DskipTests -B
+        run: |
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests -B
 
       - name: Upload Packaged JAR
         uses: actions/upload-artifact@v4
@@ -160,7 +166,9 @@ jobs:
           cache: 'maven'
 
       - name: Run Flyway Migrations
-        run: ./mvnw flyway:migrate -B
+        run: |
+          chmod +x mvnw
+          ./mvnw flyway:migrate -B
         env:
           DATABASE_URL: ${{ secrets.PROD_DATABASE_URL || 'jdbc:postgresql://postgres:5432/reservation_db' }}
           DB_USERNAME: ${{ secrets.PROD_DB_USERNAME || 'postgres' }}
@@ -186,3 +194,4 @@ jobs:
           echo "Environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}"
           echo "Database migrations verified and applied via Flyway."
           # Deployment command (e.g. docker compose pull && docker compose up -d, or kubectl rollout, etc.)
+

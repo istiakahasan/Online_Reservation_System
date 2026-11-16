@@ -1,2 +1,10 @@
+# Enforce UNIX line endings for all text source files across Git
+* text=auto eol=lf
+
+# Shell scripts
 /mvnw text eol=lf
+*.sh text eol=lf
+
+# Windows command scripts
 *.cmd text eol=crlf
+*.bat text eol=crlf

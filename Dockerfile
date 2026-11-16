@@ -62,3 +62,4 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
 
 # Launch the application using Spring Boot's Layered JarLauncher
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+
