@@ -154,6 +154,21 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
+    # Local Postgres is the migration target when no production secret is configured
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: reservation_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -168,9 +183,9 @@ jobs:
       - name: Run Flyway Migrations
         run: |
           chmod +x mvnw
-          ./mvnw flyway:migrate -B
+          ./mvnw flyway:migrate -B -Dflyway.url="$DATABASE_URL" -Dflyway.user="$DB_USERNAME" -Dflyway.password="$DB_PASSWORD"
         env:
-          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL || 'jdbc:postgresql://postgres:5432/reservation_db' }}
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL || 'jdbc:postgresql://localhost:5432/reservation_db' }}
           DB_USERNAME: ${{ secrets.PROD_DB_USERNAME || 'postgres' }}
           DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD || 'postgres' }}
 

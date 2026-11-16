@@ -29,6 +29,10 @@
         <shedlock.version>5.16.0</shedlock.version>
         <spotless.version>2.43.0</spotless.version>
         <postgresql.version>42.7.4</postgresql.version>
+        <!-- Flyway defaults; override with -Dflyway.url / -Dflyway.user / -Dflyway.password -->
+        <flyway.url>jdbc:postgresql://localhost:5432/reservation_db</flyway.url>
+        <flyway.user>postgres</flyway.user>
+        <flyway.password>postgres</flyway.password>
     </properties>
 
     <dependencies>
@@ -251,9 +255,6 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <configuration>
-                    <url>${env.DATABASE_URL:jdbc:postgresql://localhost:5432/reservation_db}</url>
-                    <user>${env.DB_USERNAME:postgres}</user>
-                    <password>${env.DB_PASSWORD:postgres}</password>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
