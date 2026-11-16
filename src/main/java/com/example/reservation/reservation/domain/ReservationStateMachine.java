@@ -4,7 +4,6 @@ import com.example.reservation.reservation.domain.event.*;
 import com.example.reservation.reservation.domain.exception.InvalidReservationTransitionException;
 import com.example.reservation.reservation.domain.exception.UnauthorizedReservationActionException;
 import com.example.reservation.user.domain.UserRole;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.EnumSet;

@@ -1,5 +1,10 @@
 package com.example.reservation.shared.security;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.example.reservation.auth.service.JwtService;
 import com.example.reservation.business.api.BusinessController;
 import com.example.reservation.business.service.BusinessService;
@@ -11,6 +16,7 @@ import com.example.reservation.shared.exception.GlobalExceptionHandler;
 import com.example.reservation.shared.observability.MdcLoggingFilter;
 import com.example.reservation.user.domain.UserRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,13 +28,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.UUID;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {BusinessController.class, ReservationController.class})
 @Import({
@@ -188,4 +187,3 @@ class SecurityIntegrationTest {
         }
     }
 }
-

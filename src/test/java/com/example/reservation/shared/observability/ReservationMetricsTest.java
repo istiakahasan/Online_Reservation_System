@@ -1,5 +1,8 @@
 package com.example.reservation.shared.observability;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import com.example.reservation.reservation.domain.ReservationStatus;
 import com.example.reservation.reservation.repo.ReservationRepository;
 import io.micrometer.core.instrument.Counter;
@@ -7,19 +10,14 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationMetricsTest {
@@ -118,4 +116,3 @@ class ReservationMetricsTest {
         assertThat(gauge.value()).isEqualTo(42.0);
     }
 }
-

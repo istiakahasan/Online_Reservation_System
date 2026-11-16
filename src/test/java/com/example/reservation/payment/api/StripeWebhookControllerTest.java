@@ -1,5 +1,13 @@
 package com.example.reservation.payment.api;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.example.reservation.payment.domain.exception.InvalidWebhookSignatureException;
 import com.example.reservation.payment.service.StripeService;
 import com.example.reservation.shared.exception.GlobalExceptionHandler;
@@ -12,14 +20,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StripeWebhookController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -82,4 +82,3 @@ class StripeWebhookControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("INVALID_WEBHOOK_SIGNATURE"));
     }
 }
-

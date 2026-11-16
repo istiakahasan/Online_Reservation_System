@@ -1,5 +1,7 @@
 package com.example.reservation.reservation.jobs;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.reservation.business.domain.BusinessEntity;
 import com.example.reservation.business.repo.BusinessRepository;
 import com.example.reservation.reservation.domain.ReservationEntity;
@@ -10,6 +12,15 @@ import com.example.reservation.service.repo.ServiceRepository;
 import com.example.reservation.user.domain.UserEntity;
 import com.example.reservation.user.domain.UserRole;
 import com.example.reservation.user.repo.UserRepository;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,18 +38,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @Testcontainers
@@ -258,4 +257,3 @@ class ShedLockConcurrencyIntegrationTest {
         assertThat(lockCount).isEqualTo(1);
     }
 }
-

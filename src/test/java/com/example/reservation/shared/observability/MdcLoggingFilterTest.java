@@ -1,9 +1,14 @@
 package com.example.reservation.shared.observability;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.reservation.shared.security.AuthenticatedUser;
 import com.example.reservation.user.domain.UserRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import java.io.IOException;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,12 +18,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.io.IOException;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class MdcLoggingFilterTest {
 
@@ -127,4 +126,3 @@ class MdcLoggingFilterTest {
         assertThat(capturedUser.get()).isEqualTo("anonymous");
     }
 }
-

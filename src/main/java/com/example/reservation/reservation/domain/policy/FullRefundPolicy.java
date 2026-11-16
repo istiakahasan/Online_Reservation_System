@@ -1,9 +1,8 @@
 package com.example.reservation.reservation.domain.policy;
 
 import com.example.reservation.reservation.domain.ReservationEntity;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
+import org.springframework.stereotype.Component;
 
 @Component
 public class FullRefundPolicy implements RefundPolicy {
@@ -21,4 +20,3 @@ public class FullRefundPolicy implements RefundPolicy {
         return new RefundDecision(true, amountPaid, getPolicyType(), "Full refund granted per business policy");
     }
 }
-

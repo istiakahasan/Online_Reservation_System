@@ -1,10 +1,9 @@
 package com.example.reservation.reservation.domain.policy;
 
 import com.example.reservation.reservation.domain.ReservationEntity;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PartialRefundPolicy implements RefundPolicy {
@@ -35,4 +34,3 @@ public class PartialRefundPolicy implements RefundPolicy {
                 String.format("Partial refund of %s%% granted per business policy", percentage.stripTrailingZeros().toPlainString()));
     }
 }
-

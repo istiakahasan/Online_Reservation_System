@@ -3,11 +3,10 @@ package com.example.reservation.business.service;
 import com.example.reservation.business.api.dto.BusinessResponseDto;
 import com.example.reservation.business.api.dto.CreateBusinessRequestDto;
 import com.example.reservation.business.repo.BusinessRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,4 +34,3 @@ public class BusinessServiceImpl implements BusinessService {
         return null;
     }
 }
-

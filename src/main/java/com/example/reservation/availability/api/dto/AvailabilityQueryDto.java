@@ -2,7 +2,6 @@ package com.example.reservation.availability.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -27,4 +26,3 @@ public record AvailabilityQueryDto(
         @NotNull(message = "toTime is required")
         Instant toTime
 ) {}
-

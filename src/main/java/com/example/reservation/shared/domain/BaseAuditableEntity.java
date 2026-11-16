@@ -3,12 +3,11 @@ package com.example.reservation.shared.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.Instant;
 
 @Getter
 @Setter
@@ -30,4 +29,3 @@ public abstract class BaseAuditableEntity {
     @Column(name = "version", nullable = false)
     private Long version;
 }
-

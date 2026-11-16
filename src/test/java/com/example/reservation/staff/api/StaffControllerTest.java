@@ -1,5 +1,7 @@
 package com.example.reservation.staff.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.reservation.staff.service.StaffService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,8 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @WebMvcTest(StaffController.class)
 @AutoConfigureMockMvc(addFilters = false)

@@ -1,0 +1,188 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================================================
+  # 1. Lint Job (Code Formatting & Static Analysis)
+  # ============================================================================
+  lint:
+    name: 1. Lint (Spotless Check)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Verify Code Formatting (Spotless)
+        run: ./mvnw spotless:check -B
+
+  # ============================================================================
+  # 2. Test Job (Unit & Testcontainers Integration Tests)
+  # ============================================================================
+  test:
+    name: 2. Test (JUnit 5 & Testcontainers)
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Execute Tests (with Testcontainers PostgreSQL & Redis)
+        run: ./mvnw clean test -B
+        env:
+          TESTCONTAINERS_RYUK_DISABLED: "false"
+
+      - name: Publish Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: target/surefire-reports/
+          retention-days: 7
+
+  # ============================================================================
+  # 3. Package Job (Compile Production Artifact)
+  # ============================================================================
+  package:
+    name: 3. Package Application Artifact
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build Layered Spring Boot JAR
+        run: ./mvnw clean package -DskipTests -B
+
+      - name: Upload Packaged JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-jar
+          path: target/*.jar
+          retention-days: 7
+
+  # ============================================================================
+  # 4. Build & Push Image Job (Multi-Stage Docker → GHCR)
+  # ============================================================================
+  build-and-push:
+    name: 4. Build Image & Push to GHCR
+    needs: package
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=dev,enable=${{ github.ref == 'refs/heads/dev' }}
+            type=sha,format=short
+
+      - name: Build and Push Layered Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================================================
+  # 5. Flyway Migration Job (Runs as an independent job before deploy)
+  # ============================================================================
+  flyway-migration:
+    name: 5. Database Schema Migration (Flyway)
+    needs: package
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Flyway Migrations
+        run: ./mvnw flyway:migrate -B
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL || 'jdbc:postgresql://postgres:5432/reservation_db' }}
+          DB_USERNAME: ${{ secrets.PROD_DB_USERNAME || 'postgres' }}
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD || 'postgres' }}
+
+  # ============================================================================
+  # 6. Deploy Job (Rollout to Target Environment)
+  # ============================================================================
+  deploy:
+    name: 6. Deploy Containerized Service
+    needs: [build-and-push, flyway-migration]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Deploy Container to Target Cluster / Host
+        run: |
+          echo "Deploying image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo "Environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}"
+          echo "Database migrations verified and applied via Flyway."
+          # Deployment command (e.g. docker compose pull && docker compose up -d, or kubectl rollout, etc.)

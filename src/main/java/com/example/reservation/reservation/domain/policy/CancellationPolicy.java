@@ -2,7 +2,6 @@ package com.example.reservation.reservation.domain.policy;
 
 import com.example.reservation.reservation.domain.ReservationEntity;
 import com.example.reservation.reservation.domain.exception.CancellationWindowExpiredException;
-
 import java.time.Duration;
 import java.time.Instant;
 
@@ -22,4 +21,3 @@ public interface CancellationPolicy {
         }
     }
 }
-

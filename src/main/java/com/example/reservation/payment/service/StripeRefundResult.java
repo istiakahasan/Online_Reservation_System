@@ -18,4 +18,3 @@ public record StripeRefundResult(
         return new StripeRefundResult(false, null, BigDecimal.ZERO, null, "FAILED", errorMessage);
     }
 }
-

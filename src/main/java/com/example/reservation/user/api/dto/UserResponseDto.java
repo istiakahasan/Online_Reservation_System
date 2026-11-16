@@ -1,7 +1,6 @@
 package com.example.reservation.user.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -34,4 +33,3 @@ public record UserResponseDto(
         @Schema(description = "Profile creation timestamp")
         Instant createdAt
 ) {}
-

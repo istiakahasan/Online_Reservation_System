@@ -3,6 +3,7 @@ package com.example.reservation.notification.service.channel;
 import com.example.reservation.notification.domain.NotificationLogEntity;
 import com.example.reservation.notification.repo.NotificationLogRepository;
 import jakarta.mail.internet.MimeMessage;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -12,10 +13,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.context.Context;
-
-import java.time.Instant;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 @Slf4j
 @Component

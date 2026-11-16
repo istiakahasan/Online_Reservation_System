@@ -12,10 +12,16 @@ import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedExc
 import com.example.reservation.reservation.repo.ReservationRepository;
 import com.example.reservation.service.domain.ServiceEntity;
 import com.example.reservation.service.repo.ServiceRepository;
-import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.shared.exception.AppException;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.user.domain.UserEntity;
 import com.example.reservation.user.repo.UserRepository;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,13 +29,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service

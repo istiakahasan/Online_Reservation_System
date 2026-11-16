@@ -46,4 +46,3 @@ public enum ReservationStatus {
         return nextAllowedStatuses().isEmpty();
     }
 }
-

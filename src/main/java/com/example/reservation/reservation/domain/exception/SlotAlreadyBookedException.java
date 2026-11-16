@@ -13,4 +13,3 @@ public class SlotAlreadyBookedException extends AppException {
         this("The requested time slot has already been booked or is no longer available.");
     }
 }
-

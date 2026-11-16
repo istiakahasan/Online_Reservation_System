@@ -31,4 +31,3 @@ public class ObservabilityConfig {
                 .commonTags("application", "Online_Reservation_System");
     }
 }
-

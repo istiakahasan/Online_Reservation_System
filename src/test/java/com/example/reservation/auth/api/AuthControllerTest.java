@@ -1,5 +1,14 @@
 package com.example.reservation.auth.api;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.example.reservation.auth.api.dto.AuthResponseDto;
 import com.example.reservation.auth.api.dto.LoginRequestDto;
 import com.example.reservation.auth.api.dto.LogoutRequestDto;
@@ -7,15 +16,14 @@ import com.example.reservation.auth.api.dto.RefreshTokenRequestDto;
 import com.example.reservation.auth.api.dto.RegisterRequestDto;
 import com.example.reservation.auth.service.AuthService;
 import com.example.reservation.auth.service.JwtService;
-import com.example.reservation.shared.config.OpenApiConfig;
 import com.example.reservation.shared.config.WebMvcConfig;
 import com.example.reservation.shared.exception.AppException;
 import com.example.reservation.shared.security.CurrentUserArgumentResolver;
 import com.example.reservation.shared.security.JwtAuthenticationFilter;
 import com.example.reservation.shared.security.SecurityConfig;
 import com.example.reservation.shared.security.TenantGuardFilter;
-import com.example.reservation.user.domain.UserRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,17 +34,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = AuthController.class)
 @Import({SecurityConfig.class, JwtAuthenticationFilter.class, TenantGuardFilter.class, WebMvcConfig.class, CurrentUserArgumentResolver.class})

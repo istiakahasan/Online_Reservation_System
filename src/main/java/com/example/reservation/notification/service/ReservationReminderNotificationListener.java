@@ -1,15 +1,13 @@
 package com.example.reservation.notification.service;
 
 import com.example.reservation.reservation.domain.event.ReservationReminderEvent;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Component
@@ -37,4 +35,3 @@ public class ReservationReminderNotificationListener {
         receivedEvents.clear();
     }
 }
-

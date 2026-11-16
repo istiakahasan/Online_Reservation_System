@@ -14,4 +14,3 @@ public record CancelReservationResult(
         String refundStatus,
         String cancellationReason
 ) {}
-

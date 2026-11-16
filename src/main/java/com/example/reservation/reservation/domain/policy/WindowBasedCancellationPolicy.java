@@ -1,10 +1,9 @@
 package com.example.reservation.reservation.domain.policy;
 
 import com.example.reservation.reservation.domain.ReservationEntity;
-import org.springframework.stereotype.Component;
-
 import java.time.Duration;
 import java.time.Instant;
+import org.springframework.stereotype.Component;
 
 @Component
 public class WindowBasedCancellationPolicy implements CancellationPolicy {
@@ -25,4 +24,3 @@ public class WindowBasedCancellationPolicy implements CancellationPolicy {
         return !checkTime.isAfter(latestAllowedCancellationTime);
     }
 }
-

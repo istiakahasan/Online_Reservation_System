@@ -13,8 +13,8 @@ import com.example.reservation.reservation.domain.ReservationStatus;
 import com.example.reservation.reservation.domain.event.ReservationConfirmed;
 import com.example.reservation.reservation.domain.exception.SlotAlreadyBookedException;
 import com.example.reservation.reservation.repo.ReservationRepository;
-import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.shared.exception.AppException;
+import com.example.reservation.shared.observability.ReservationMetrics;
 import com.example.reservation.user.domain.UserRole;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
@@ -25,6 +25,10 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.net.EventGSON;
 import com.stripe.net.Webhook;
 import com.stripe.param.PaymentIntentCreateParams;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,11 +36,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -314,4 +313,3 @@ public class StripeServiceImpl implements StripeService {
         return EventGSON.getInstance().fromJson(rawPayload, PaymentIntent.class);
     }
 }
-
