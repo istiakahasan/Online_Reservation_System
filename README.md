@@ -132,7 +132,7 @@ flowchart TD
 
     %% Payment flows
     ReservationModule -->|Init PaymentIntent| PaymentModule
-    PaymentModule -->|Stripe REST API (No DB TX)| StripeGateway
+    PaymentModule -->|"Stripe REST API (No DB TX)"| StripeGateway
     StripeGateway -.->|Signed Webhook Event| PaymentModule
 
     %% Caching & Background jobs
