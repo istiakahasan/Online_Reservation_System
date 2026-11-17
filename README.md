@@ -315,7 +315,7 @@ sequenceDiagram
     ThreadA->>Redis: unlock("lock:slot:biz1:slot99")
     ThreadA-->>ThreadA: Proceed to Stripe PaymentIntent creation
 
-    Note over Redis: Lock released; Request B acquires lock
+    Note over Redis: Lock released, Request B acquires lock
     Redis-->>ThreadB: Lock Acquired (true)
     ThreadB->>DB: BEGIN TX -> Query overlapping active/held reservations
     Note over DB: Overlap detected! Slot status is PENDING_PAYMENT
